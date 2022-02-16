@@ -20,11 +20,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
+import com.bcr.moviejetpackcompose.core.model.Crew
+import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.ui.NavigationRoot
-import com.bcr.moviejetpackcompose.ui.theme.appTypography
+import com.bcr.moviejetpackcompose.ui.theme.*
 
 @Composable
-fun HMovieCard(navController: NavController, isMovie: Boolean = true) {
+fun HMovieCard(navController: NavController, movie: Movie, isMovie: Boolean = true) {
     val width = LocalConfiguration.current.screenWidthDp
     Box(modifier = Modifier
         .padding(end = 16.dp)
@@ -32,15 +34,15 @@ fun HMovieCard(navController: NavController, isMovie: Boolean = true) {
         .width((width / 3).dp)
         .clickable {
             if (isMovie) {
-                navController.navigate(NavigationRoot.MovieDetail.createRouteWithArguments(1))
+                navController.navigate(NavigationRoot.MovieDetail.createRouteWithArguments(movie))
             } else {
-                navController.navigate(NavigationRoot.TVDetail.createRouteWithArguments(1))
+                navController.navigate(NavigationRoot.TVDetail.createRouteWithArguments(movie))
             }
         }) {
 
         Column {
             Image(
-                painter = rememberImagePainter(data ="https://gmedia.playstation.com/is/image/SIEPDC/spiderman-miles-morales-screenshot-04-disclaimer-en-01oct20?\$600px--t\$"),
+                painter = rememberImagePainter(data = movie.getImageBackdrop()),
                 contentDescription = "Forest Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -48,13 +50,13 @@ fun HMovieCard(navController: NavController, isMovie: Boolean = true) {
                     .height((width / 3).dp)
                     .clip(RoundedCornerShape(10.dp))
             )
-            Text(text = "Spider man Jack Sparrow",
+            Text(text = movie.getTitleMovie(),
                 style = appTypography.body2,
                 modifier = Modifier.padding(top = 16.dp),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(text = "12/12/2021",
+            Text(text = movie.getDateMovie(),
                 style = appTypography.caption.copy(Color.DarkGray),
                 modifier = Modifier.padding(top = 16.dp),
                 maxLines = 3,
@@ -66,22 +68,22 @@ fun HMovieCard(navController: NavController, isMovie: Boolean = true) {
 }
 
 @Composable
-fun VMovieCard(navController: NavController, isMovie: Boolean = true) {
+fun VMovieCard(navController: NavController, movie: Movie, isMovie: Boolean = true) {
     val width = LocalConfiguration.current.screenWidthDp
     Box(modifier = Modifier
         .padding(bottom = 16.dp, start = 16.dp, end = 16.dp)
         .wrapContentHeight()
         .clickable {
             if (isMovie) {
-                navController.navigate(NavigationRoot.MovieDetail.createRouteWithArguments(1))
+                navController.navigate(NavigationRoot.MovieDetail.createRouteWithArguments(movie))
             } else {
-                navController.navigate(NavigationRoot.TVDetail.createRouteWithArguments(1))
+                navController.navigate(NavigationRoot.TVDetail.createRouteWithArguments(movie))
             }
         }) {
 
         Row {
             Image(
-                painter = rememberImagePainter(data ="https://gmedia.playstation.com/is/image/SIEPDC/spiderman-miles-morales-screenshot-04-disclaimer-en-01oct20?\$600px--t\$"),
+                painter = rememberImagePainter(data = movie.getImageBackdrop()),
                 contentDescription = "Forest Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -94,18 +96,18 @@ fun VMovieCard(navController: NavController, isMovie: Boolean = true) {
                 .wrapContentHeight()
                 .padding(start = 16.dp)) {
 
-                Text(text = "Spider man Jack Sparrow",
+                Text(text = movie.getTitleMovie(),
                     style = appTypography.body2,
-                    modifier = Modifier.padding(bottom = 8.dp),
+                    modifier = Modifier.padding(bottom = 12.dp),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
 
-                LabelRating(rate = 8.5)
+                movie.voteAverage?.let { LabelRating(rate = it) }
 
-                Text(text = "Action, Comedy, Travel",
-                    style = appTypography.caption.copy(Color.DarkGray),
-                    modifier = Modifier.padding(top = 5.dp),
+                Text(text = movie.genreList(),
+                    style = appTypography.body2.copy(Color.DarkGray),
+                    modifier = Modifier.padding(top = 12.dp),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -119,10 +121,16 @@ fun VMovieCard(navController: NavController, isMovie: Boolean = true) {
 
 @Composable
 fun LabelRating(rate: Double) {
+    var bgColor = green
+    if (rate < 7.0) {
+        bgColor = red
+    } else if (rate < 8) {
+        bgColor = yellow
+    }
     Box(modifier = Modifier
         .wrapContentHeight()
         .wrapContentWidth()
-        .background(Color.Magenta, RoundedCornerShape(5.dp)),
+        .background(bgColor, RoundedCornerShape(5.dp)),
     ) {
         Text(text = "$rate",
             style = TextStyle(
@@ -135,7 +143,7 @@ fun LabelRating(rate: Double) {
 }
 
 @Composable
-fun CreditPeopleCard() {
+fun CreditPeopleCard(crew: Crew) {
     val width = LocalConfiguration.current.screenWidthDp
     val imageSize = width / 5
     Box(modifier = Modifier
@@ -146,7 +154,7 @@ fun CreditPeopleCard() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = rememberImagePainter(data ="https://images.unsplash.com/photo-1516756587022-7891ad56a8cd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=187&q=80"),
+                painter = rememberImagePainter(data = crew.getImageProfile()),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -155,18 +163,17 @@ fun CreditPeopleCard() {
                     .clip(CircleShape)
             )
             
-            Text(text = "Micheal wyan Micheal wyan Micheal wyan",
+            Text(text = crew.name!!,
                 style = appTypography.caption,
                 maxLines = 2,
                 modifier = Modifier.padding(top = 8.dp),
                 overflow = TextOverflow.Ellipsis)
-            
         }
     }
 }
 
 @Composable
-fun SimiliarMovieCard(width: Int, navController: NavController, isMovie: Boolean = true) {
+fun SimiliarMovieCard(width: Int, navController: NavController, movie: Movie, isMovie: Boolean = true) {
     Column(
         modifier = Modifier
             .padding(8.dp)
@@ -174,24 +181,24 @@ fun SimiliarMovieCard(width: Int, navController: NavController, isMovie: Boolean
             .wrapContentHeight()
             .clickable {
                 if (isMovie) {
-                    navController.navigate(NavigationRoot.MovieDetail.createRouteWithArguments(1))
+                    navController.navigate(NavigationRoot.MovieDetail.createRouteWithArguments(movie))
                 } else {
-                    navController.navigate(NavigationRoot.TVDetail.createRouteWithArguments(1))
+                    navController.navigate(NavigationRoot.TVDetail.createRouteWithArguments(movie))
                 }
             },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = rememberImagePainter(data ="https://images.unsplash.com/photo-1516756587022-7891ad56a8cd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=187&q=80"),
+            painter = rememberImagePainter(data = movie.getImageBackdrop()),
             contentDescription = null,
-            contentScale = ContentScale.FillWidth,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
                 .height((width / 4).dp)
                 .clip(RoundedCornerShape(5.dp))
         )
 
-        Text(text = "Micheal wyan Micheal wyan Micheal wyan",
+        Text(text = movie.getTitleMovie(),
             style = appTypography.caption,
             maxLines = 2,
             modifier = Modifier.padding(top = 8.dp),

@@ -25,17 +25,21 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
+import com.bcr.moviejetpackcompose.core.viewmodels.HomeViewModel
 import com.bcr.moviejetpackcompose.ui.NavigationRoot
 import com.bcr.moviejetpackcompose.ui.card.HMovieCard
 import com.bcr.moviejetpackcompose.ui.card.VMovieCard
 import com.bcr.moviejetpackcompose.ui.theme.appTypography
+import com.bcr.moviejetpackcompose.utils.getMovieImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 
 private lateinit var appNavController: NavHostController
+private lateinit var viewmodel: HomeViewModel
 
 @ExperimentalPagerApi
 @Composable
-fun HomeScreen(navController: NavHostController?) {
+fun HomeScreen(navController: NavHostController?, viewModel: HomeViewModel) {
+    viewmodel = viewModel
     navController?.let { appNavController = it }
     Scaffold() {
         Column {
@@ -99,7 +103,9 @@ fun ContentHome() {
                 style = appTypography.body2.copy(fontWeight = FontWeight.Bold))
         }
 
-        items(count = 10) { VMovieCard(appNavController) }
+        itemsIndexed(viewmodel.topMovies) { index, item ->
+            VMovieCard(appNavController, item)
+        }
 
         item {
             Spacer(modifier = Modifier.height(100.dp))
@@ -110,7 +116,6 @@ fun ContentHome() {
 @ExperimentalPagerApi
 @Composable
 fun UpcomingHome() {
-    val list = listOf<Int>(0, 1, 2, 3, 4, 5, 6, 7)
     val width = LocalConfiguration.current.screenWidthDp / 2.5
 
     LazyRow(
@@ -120,9 +125,9 @@ fun UpcomingHome() {
             .padding(vertical = 14.dp),
         contentPadding = PaddingValues(horizontal = 14.dp)
     ) {
-        itemsIndexed(list){ _, _ ->
+        itemsIndexed(viewmodel.upcomingMovies){ index, item ->
             Image(
-                painter = rememberImagePainter(data ="https://gmedia.playstation.com/is/image/SIEPDC/spiderman-miles-morales-screenshot-04-disclaimer-en-01oct20?\$600px--t\$"),
+                painter = rememberImagePainter(data = item.getImageBackdrop()),
                 contentDescription = "Forest Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -131,7 +136,9 @@ fun UpcomingHome() {
                     .width(width.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .clickable {
-                        appNavController.navigate(NavigationRoot.MovieDetail.createRouteWithArguments(1))
+                        appNavController.navigate(
+                            NavigationRoot.MovieDetail.createRouteWithArguments(item)
+                        )
                     }
             )
         }
@@ -150,9 +157,11 @@ fun PopularMovieHome() {
             .wrapContentHeight()
             .padding(),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp)) {
-            
-            items(count = 10) {   HMovieCard(appNavController)  }
-            
+
+            itemsIndexed(viewmodel.popularMovies) { _, item ->
+                HMovieCard(navController = appNavController, movie = item)
+            }
+
         }
         
     }
@@ -162,5 +171,5 @@ fun PopularMovieHome() {
 @ExperimentalPagerApi
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(null)
+    HomeScreen(null, HomeViewModel())
 }

@@ -30,6 +30,7 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 @Composable
 fun AppBarScaffold(
     navController: NavHostController,
+    url: String,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
@@ -48,7 +49,7 @@ fun AppBarScaffold(
                 color = primaryBlack,
                 elevation = AppBarDefaults.TopAppBarElevation,
             ) {
-                AppBarContent( progress = progress )
+                AppBarContent( progress = progress, url = url)
             }
             CollapsedAppBar(
                 navController = navController,
@@ -99,6 +100,7 @@ private fun CollapsedAppBar(
 @Composable
 private fun AppBarContent(
     modifier: Modifier = Modifier,
+    url: String,
     @FloatRange(from = 0.0, to = 1.0) progress: Float,
 ) {
     Box(
@@ -108,7 +110,7 @@ private fun AppBarContent(
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = rememberImagePainter(data ="https://gmedia.playstation.com/is/image/SIEPDC/spiderman-miles-morales-screenshot-04-disclaimer-en-01oct20?\$600px--t\$"),
+            painter = rememberImagePainter(data = url),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
