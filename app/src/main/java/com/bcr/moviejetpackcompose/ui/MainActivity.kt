@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -20,23 +21,32 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import com.bcr.moviejetpackcompose.core.model.Movie
+import com.bcr.moviejetpackcompose.core.viewmodels.HomeViewModel
+import com.bcr.moviejetpackcompose.core.viewmodels.TVViewModel
 import com.bcr.moviejetpackcompose.ui.detail.DetailMovieScreen
 import com.bcr.moviejetpackcompose.ui.detail.DetailTVScreen
 import com.bcr.moviejetpackcompose.ui.home.HomeScreen
 import com.bcr.moviejetpackcompose.ui.theme.AppTheme
 import com.bcr.moviejetpackcompose.ui.theme.blueYoung
 import com.bcr.moviejetpackcompose.ui.tv.TVScreen
+import com.bcr.moviejetpackcompose.utils.extensions.fromJson
 import com.google.accompanist.pager.ExperimentalPagerApi
 
 @ExperimentalPagerApi
 class MainActivity : ComponentActivity() {
+
+    private val homeVM by viewModels<HomeViewModel>()
+    private val tvVM by viewModels<TVViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        homeVM.getMovieList()
+        tvVM.getMovieList()
         setContent {
             AppTheme {
                 window?.statusBarColor = 0xFF4A536D.toInt()
-                MainScreen()
+                MainScreen(homeVM, tvVM)
             }
         }
     }
@@ -44,13 +54,13 @@ class MainActivity : ComponentActivity() {
 
 @ExperimentalPagerApi
 @Composable
-fun MainScreen() {
+fun MainScreen(homeViewModel: HomeViewModel, tvViewModel: TVViewModel) {
     val navController = rememberNavController()
     Scaffold(
         modifier = Modifier.background(Color.White),
         bottomBar = { BottomNavigationBar(navController) }
     ) {
-        NavigationGraph(navController)
+        NavigationGraph(navController, homeViewModel, tvViewModel)
     }
 }
 
@@ -67,23 +77,29 @@ fun currentRoute(navController: NavController): String {
 
 @ExperimentalPagerApi
 @Composable
-fun NavigationGraph(navController: NavHostController) {
+fun NavigationGraph(navController: NavHostController,
+                    homeViewModel: HomeViewModel,
+                    tvViewModel: TVViewModel) {
     NavHost(navController, startDestination = NavigationRoot.Home.route) {
         composable(NavigationRoot.Home.route) {
-            HomeScreen(navController)
+            HomeScreen(navController, homeViewModel)
         }
         composable(NavigationRoot.Search.route) {
-            TVScreen(navController)
+            TVScreen(navController, tvViewModel)
         }
         composable(NavigationRoot.MovieDetail.route,
             arguments = NavigationRoot.MovieDetail.arguments) { backStackEntry ->
             val argument = requireNotNull(backStackEntry.arguments)
-            DetailMovieScreen(navController = navController, movieId = argument.getInt(NavigationRoot.MovieDetail.Keys.movieId))
+            NavigationRoot.MovieDetail.getArguments(argument = argument)?.let {
+                DetailMovieScreen(navController = navController, movie = it)
+            }
         }
         composable(NavigationRoot.TVDetail.route,
             arguments = NavigationRoot.TVDetail.arguments) { backStackEntry ->
             val argument = requireNotNull(backStackEntry.arguments)
-            DetailTVScreen(navController = navController, movieId = argument.getInt(NavigationRoot.TVDetail.Keys.movieId))
+            NavigationRoot.TVDetail.getArguments(argument)?.let {
+                DetailTVScreen(navController = navController, movie = it)
+            }
         }
     }
 }
@@ -92,7 +108,7 @@ fun NavigationGraph(navController: NavHostController) {
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
-    MainScreen()
+    MainScreen(HomeViewModel(), TVViewModel())
 }
 
 @Composable
