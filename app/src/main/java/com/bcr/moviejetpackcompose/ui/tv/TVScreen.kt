@@ -11,6 +11,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,18 +21,20 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.core.viewmodels.TVViewModel
+import com.bcr.moviejetpackcompose.core.viewmodels.TVViewModelState
 import com.bcr.moviejetpackcompose.ui.card.HMovieCard
+import com.bcr.moviejetpackcompose.ui.components.HShimmerAnimation
 import com.bcr.moviejetpackcompose.ui.theme.appTypography
 import com.google.accompanist.pager.ExperimentalPagerApi
 
 private lateinit var appNavController: NavHostController
-private lateinit var viewmodel: TVViewModel
+private lateinit var uiState: State<TVViewModelState>
 
 
 @ExperimentalPagerApi
 @Composable
 fun TVScreen(navController: NavHostController?, viewModel: TVViewModel) {
-    viewmodel = viewModel
+    uiState = viewModel.uiState.collectAsState()
     navController?.let { appNavController = navController }
     Scaffold() {
         Column {
@@ -81,16 +85,34 @@ fun ContentTV() {
     LazyColumn(modifier = Modifier
         .background(Color.White)
         .fillMaxSize()) {
-        item { PopularMovieTV("Popular", viewmodel.popularMovies) }
+        item {
+            if (uiState.value.isLoadPopular) {
+                HShimmerAnimation()
+            } else {
+                PopularMovieTV("Popular", uiState.value.popularMovies)
+            }
+        }
         item {
             Spacer(modifier = Modifier.height(16.dp))
         }
-        item { PopularMovieTV("On Air", viewmodel.onAirMovies) }
+        item {
+            if (uiState.value.isLoadOnAir) {
+                HShimmerAnimation()
+            } else {
+                PopularMovieTV("On Air", uiState.value.onAirMovies)
+            }
+        }
         item {
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        item { PopularMovieTV("Top Movie", viewmodel.topMovies) }
+        item {
+            if (uiState.value.isLoadTopRate) {
+                HShimmerAnimation()
+            } else {
+                PopularMovieTV("Top Movie", uiState.value.topMovies)
+            }
+        }
         item {
             Spacer(modifier = Modifier.height(100.dp))
         }

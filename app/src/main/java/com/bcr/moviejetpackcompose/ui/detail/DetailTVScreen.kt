@@ -1,7 +1,6 @@
 package com.bcr.moviejetpackcompose.ui.detail
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,20 +14,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.rememberImagePainter
 import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.core.viewmodels.DetailTVViewModel
+import com.bcr.moviejetpackcompose.core.viewmodels.DetailViewModelState
 import com.bcr.moviejetpackcompose.ui.card.CreditPeopleCard
 import com.bcr.moviejetpackcompose.ui.card.LabelRating
 import com.bcr.moviejetpackcompose.ui.card.SimiliarMovieCard
+import com.bcr.moviejetpackcompose.ui.components.AppImage
+import com.bcr.moviejetpackcompose.ui.components.PeopleShimmerItem
+import com.bcr.moviejetpackcompose.ui.components.SimiliarShimmerItem
 import com.bcr.moviejetpackcompose.ui.components.TagLabel
 import com.bcr.moviejetpackcompose.ui.theme.appTypography
 import com.bcr.moviejetpackcompose.ui.theme.primaryBlack
@@ -42,12 +45,13 @@ import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
 private lateinit var appNavController: NavHostController
-private lateinit var viewmodel: DetailTVViewModel
+private lateinit var uiState: State<DetailViewModelState>
 
 @Composable
 fun DetailTVScreen(navController: NavHostController,
                    movie: Movie) {
-    viewmodel = DetailTVViewModel()
+    val viewmodel = DetailTVViewModel()
+    uiState = viewmodel.uiState.collectAsState()
     viewmodel.getDetailMovie(movie)
     appNavController = navController
     Surface(
@@ -68,15 +72,16 @@ fun DetailTVScreen(navController: NavHostController,
                     }
                 ) {
                     BoxWithConstraints(modifier = Modifier.background(color = Color.White)) {
-                        Image(
-                            painter = rememberImagePainter(data = viewmodel.movie?.getImageBackdrop()),
-                            contentDescription = "Forest Image",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .height(360.dp)
-                                .clip(RoundedCornerShape(bottomStart = 32.dp))
-                        )
+                        uiState.value.movie?.getImageBackdrop()?.let {
+                            AppImage(
+                                url = it,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .height(360.dp)
+                                    .clip(RoundedCornerShape(bottomStart = 32.dp))
+                            )
+                        }
+
                         Column() {
                             Spacer(modifier = Modifier.height(300.dp))
                             Box(modifier = Modifier.padding(start = 32.dp, top = 16.dp, bottom = 16.dp)) {
@@ -88,17 +93,17 @@ fun DetailTVScreen(navController: NavHostController,
                                     ) {
                                         Column(modifier = Modifier.weight(1f),
                                             horizontalAlignment = Alignment.CenterHorizontally) {
-                                            Text(text = "${viewmodel.movie?.numberOfEpisodes}", style = appTypography.subtitle2)
+                                            Text(text = "${uiState.value.movie?.numberOfEpisodes}", style = appTypography.subtitle2)
                                             Text(text = "Episode", style = appTypography.body2, modifier = Modifier.padding(top = 8.dp))
                                         }
                                         Column(modifier = Modifier.weight(1f),
                                             horizontalAlignment = Alignment.CenterHorizontally) {
-                                            Text(text = "${viewmodel.movie?.popularity}", style = appTypography.subtitle2)
+                                            Text(text = "${uiState.value.movie?.popularity}", style = appTypography.subtitle2)
                                             Text(text = "Popularity", style = appTypography.body2, modifier = Modifier.padding(top = 8.dp))
                                         }
                                         Column(modifier = Modifier.weight(1f),
                                             horizontalAlignment = Alignment.CenterHorizontally) {
-                                            LabelRating(rate = viewmodel.movie?.voteAverage!!)
+                                            uiState.value.movie?.voteAverage?.let { LabelRating(rate = it) }
                                             Text(text = "Popularity", style = appTypography.body2, modifier = Modifier.padding(top = 8.dp))
                                         }
                                     }
@@ -132,7 +137,7 @@ private fun TVContent() {
         .fillMaxSize()
         .background(white)) {
         item {
-            viewmodel.movie?.let {
+            uiState.value.movie?.let {
                 Column(modifier = Modifier.padding(start = 8.dp, top = 16.dp, end = 16.dp)) {
                     Text(
                         text = it.getTitleMovie(),
@@ -156,14 +161,20 @@ private fun TVContent() {
                 .wrapContentHeight(),
                 contentPadding = PaddingValues(16.dp, end = 16.dp)
             ) {
-                itemsIndexed(viewmodel.casts) { index, item ->
-                    CreditPeopleCard(item)
+                if (uiState.value.isLoadCredit) {
+                    repeat(10) {
+                        item { PeopleShimmerItem() }
+                    }
+                } else {
+                    itemsIndexed(uiState.value.casts) { index, item ->
+                        CreditPeopleCard(item)
+                    }
                 }
             }
         }
 
         item {
-            viewmodel.movie?.let {
+            uiState.value.movie?.let {
                 Column(modifier = Modifier.padding(
                     start =  16.dp,
                     end = 16.dp,
@@ -197,11 +208,24 @@ private fun TVContent() {
 private fun SimiliarMovieTV() {
     val width = LocalConfiguration.current.screenWidthDp - 16
     FlowRow() {
-        repeat(viewmodel.similiarMovies.count()) {
-            Box(modifier = Modifier
-                .width((width / 4).dp)
-                .wrapContentHeight()) {
-                SimiliarMovieCard(width, appNavController, viewmodel.similiarMovies[it],false)
+        if (uiState.value.isLoadSimiliar) {
+            repeat(10) {
+                SimiliarShimmerItem()
+            }
+        } else {
+            repeat(uiState.value.similiarMovies.count()) {
+                Box(
+                    modifier = Modifier
+                        .width((width / 4).dp)
+                        .wrapContentHeight()
+                ) {
+                    SimiliarMovieCard(
+                        width,
+                        appNavController,
+                        uiState.value.similiarMovies[it],
+                        false
+                    )
+                }
             }
         }
     }

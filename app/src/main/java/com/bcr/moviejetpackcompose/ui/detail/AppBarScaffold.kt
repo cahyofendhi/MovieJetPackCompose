@@ -1,7 +1,6 @@
 package com.bcr.moviejetpackcompose.ui.detail
 
 import androidx.annotation.FloatRange
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -13,10 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import coil.compose.rememberImagePainter
+import com.bcr.moviejetpackcompose.ui.components.AppImage
 import com.bcr.moviejetpackcompose.ui.components.MovieAppBar
 import com.bcr.moviejetpackcompose.ui.theme.appTypography
 import com.bcr.moviejetpackcompose.ui.theme.primaryBlack
@@ -71,7 +69,7 @@ fun BackButton(navController: NavHostController) {
             .padding(horizontal = 5.dp)
             .height(25.dp)
             .width(25.dp)
-            .clickable {  navController.popBackStack() }
+            .clickable { navController.popBackStack() }
     )
 }
 
@@ -109,13 +107,11 @@ private fun AppBarContent(
             .alpha(progress.configureProgress(0.5f)),
         contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = rememberImagePainter(data = url),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
+        AppImage(
+            url = url,
             modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp)
+            .fillMaxWidth()
+            .height(300.dp)
         )
     }
 }
