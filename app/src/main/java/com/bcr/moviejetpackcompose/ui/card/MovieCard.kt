@@ -1,6 +1,5 @@
 package com.bcr.moviejetpackcompose.ui.card
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,17 +11,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
 import com.bcr.moviejetpackcompose.core.model.Crew
 import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.ui.NavigationRoot
+import com.bcr.moviejetpackcompose.ui.components.AppImage
 import com.bcr.moviejetpackcompose.ui.theme.*
 
 @Composable
@@ -41,14 +39,11 @@ fun HMovieCard(navController: NavController, movie: Movie, isMovie: Boolean = tr
         }) {
 
         Column {
-            Image(
-                painter = rememberImagePainter(data = movie.getImageBackdrop()),
-                contentDescription = "Forest Image",
-                contentScale = ContentScale.Crop,
+            AppImage(url = movie.getImageBackdrop(),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height((width / 3).dp)
-                    .clip(RoundedCornerShape(10.dp))
+                .fillMaxWidth()
+                .height((width / 3).dp)
+                .clip(RoundedCornerShape(10.dp))
             )
             Text(text = movie.getTitleMovie(),
                 style = appTypography.body2,
@@ -82,10 +77,7 @@ fun VMovieCard(navController: NavController, movie: Movie, isMovie: Boolean = tr
         }) {
 
         Row {
-            Image(
-                painter = rememberImagePainter(data = movie.getImageBackdrop()),
-                contentDescription = "Forest Image",
-                contentScale = ContentScale.Crop,
+            AppImage(url = movie.getImageBackdrop(),
                 modifier = Modifier
                     .width((width / 3 - 10).dp)
                     .height((width / 2.7).dp)
@@ -153,16 +145,13 @@ fun CreditPeopleCard(crew: Crew) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = rememberImagePainter(data = crew.getImageProfile()),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
+            AppImage(url = crew.getImageProfile(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(imageSize.dp)
                     .clip(CircleShape)
             )
-            
+
             Text(text = crew.name!!,
                 style = appTypography.caption,
                 maxLines = 2,
@@ -188,10 +177,7 @@ fun SimiliarMovieCard(width: Int, navController: NavController, movie: Movie, is
             },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = rememberImagePainter(data = movie.getImageBackdrop()),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
+        AppImage(url = movie.getImageBackdrop(),
             modifier = Modifier
                 .fillMaxWidth()
                 .height((width / 4).dp)
