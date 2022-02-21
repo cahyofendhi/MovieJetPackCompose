@@ -2,101 +2,113 @@ package com.bcr.moviejetpackcompose.ui.tv
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Icon
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.bcr.moviejetpackcompose.core.model.GroupType
 import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.core.viewmodels.TVViewModel
+import com.bcr.moviejetpackcompose.core.viewmodels.TVViewModelState
+import com.bcr.moviejetpackcompose.ui.NavigationRoot
 import com.bcr.moviejetpackcompose.ui.card.HMovieCard
+import com.bcr.moviejetpackcompose.ui.components.HShimmerAnimation
+import com.bcr.moviejetpackcompose.ui.components.SearchButton
 import com.bcr.moviejetpackcompose.ui.theme.appTypography
+import com.bcr.moviejetpackcompose.ui.theme.white
+import com.bcr.moviejetpackcompose.utils.extensions.isScrolled
 import com.google.accompanist.pager.ExperimentalPagerApi
 
 private lateinit var appNavController: NavHostController
-private lateinit var viewmodel: TVViewModel
-
+private lateinit var uiState: State<TVViewModelState>
 
 @ExperimentalPagerApi
 @Composable
 fun TVScreen(navController: NavHostController?, viewModel: TVViewModel) {
-    viewmodel = viewModel
+    uiState = viewModel.uiState.collectAsState()
     navController?.let { appNavController = navController }
-    Scaffold() {
-        Column {
-            AppBarTV()
-            ContentTV()
-        }
+    val lazyListState = rememberLazyListState()
+    Scaffold(
+        topBar = { AppBarTV(lazyListState = lazyListState) }
+    ) {
+        ContentTV(lazyListState)
     }
 }
 
 @Composable
-fun AppBarTV() {
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .height(58.dp)
-            .background(Color.White),) {
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(16.dp)
-        ) {
-
-            Text(
-                "TV",
-                style = appTypography.h6,
-                maxLines = 2,
-                modifier = Modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.Start)
-            )
-
-            Icon(
-                Icons.Outlined.Search,
-                contentDescription = "Search",
-                tint = Color.Black,
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .wrapContentWidth(Alignment.End)
-            )
-        }
-
-    }
+fun AppBarTV(lazyListState: LazyListState) {
+    TopAppBar(
+        title = {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "TV",
+                    style = appTypography.h6.copy(textAlign = TextAlign.Center),
+                )
+            }
+        },
+        navigationIcon = {},
+        actions = { SearchButton(onClick = {
+            appNavController.navigate(NavigationRoot.SearchPage.createRouteWithArguments(GroupType.tv))
+        }) },
+        backgroundColor = white,
+        elevation = if (!lazyListState.isScrolled) 0.dp else 3.dp
+    )
 }
 
 @ExperimentalPagerApi
 @Composable
-fun ContentTV() {
-    LazyColumn(modifier = Modifier
-        .background(Color.White)
-        .fillMaxSize()) {
-        item { PopularMovieTV("Popular", viewmodel.popularMovies) }
+fun ContentTV(lazyListState: LazyListState) {
+    LazyColumn(state = lazyListState,
+        modifier = Modifier
+            .background(Color.White)
+            .fillMaxSize()) {
+        item {
+            if (uiState.value.isLoadPopular) {
+                HShimmerAnimation()
+            } else {
+                PopularMovieTV("Popular", uiState.value.popularMovies)
+            }
+        }
         item {
             Spacer(modifier = Modifier.height(16.dp))
         }
-        item { PopularMovieTV("On Air", viewmodel.onAirMovies) }
+        item {
+            if (uiState.value.isLoadOnAir) {
+                HShimmerAnimation()
+            } else {
+                PopularMovieTV("On Air", uiState.value.onAirMovies)
+            }
+        }
         item {
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        item { PopularMovieTV("Top Movie", viewmodel.topMovies) }
+        item {
+            if (uiState.value.isLoadTopRate) {
+                HShimmerAnimation()
+            } else {
+                PopularMovieTV("Top Movie", uiState.value.topMovies)
+            }
+        }
         item {
             Spacer(modifier = Modifier.height(100.dp))
         }
     }
 }
-
 
 @Composable
 fun PopularMovieTV(title: String, movies: List<Movie>) {

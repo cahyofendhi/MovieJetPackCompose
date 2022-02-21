@@ -1,28 +1,30 @@
 package com.bcr.moviejetpackcompose.core.viewmodels
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bcr.moviejetpackcompose.core.model.Crew
 import com.bcr.moviejetpackcompose.core.model.GroupType
 import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.core.network.ResultWrapper
 import com.bcr.moviejetpackcompose.core.repositories.MovieRepositoryImpl
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-
 
 class DetailTVViewModel: ViewModel() {
 
-    var movie: Movie? by mutableStateOf(null)
-    var similiarMovies: List<Movie> by mutableStateOf(listOf())
-    var casts: List<Crew> by mutableStateOf(listOf())
-
     private var repository: MovieRepositoryImpl = MovieRepositoryImpl()
+    private val viewModelState = MutableStateFlow(DetailViewModelState())
+
+    val uiState = viewModelState
+        .map { it.toUiState() }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            viewModelState.value.toUiState()
+        )
+
 
     fun getDetailMovie(data: Movie) {
-        this.movie = data
+        viewModelState.update { it.copy(movie = data) }
         data.id?.let { id ->
             getMovie(id)
             getCrewMovie(id)
@@ -34,7 +36,7 @@ class DetailTVViewModel: ViewModel() {
         viewModelScope.launch {
             when (val response = repository.getDetailMovie(GroupType.tv, id)) {
                 is ResultWrapper.Success -> {
-                    movie = response.value
+                    viewModelState.update { it.copy(movie = response.value) }
                 }
                 is ResultWrapper.GenericError -> {}
                 is ResultWrapper.NetworkError -> {}
@@ -43,11 +45,12 @@ class DetailTVViewModel: ViewModel() {
     }
 
     private fun getSimiliarMovie(id: Int) {
+        viewModelState.update { it.copy(isLoadSimiliar = true) }
         viewModelScope.launch {
             when (val response = repository.getSimiliarMovie(GroupType.tv, id)) {
                 is ResultWrapper.Success -> {
-                    response.value.results?.let {
-                        similiarMovies = it
+                    response.value.results?.let { dt ->
+                        viewModelState.update { it.copy(isLoadSimiliar = false, similiarMovies = dt) }
                     }
                 }
                 is ResultWrapper.GenericError -> {}
@@ -57,11 +60,12 @@ class DetailTVViewModel: ViewModel() {
     }
 
     private fun getCrewMovie(id: Int) {
+        viewModelState.update { it.copy(isLoadCredit = true) }
         viewModelScope.launch {
             when (val response = repository.getCrewMovie(GroupType.tv, id)) {
                 is ResultWrapper.Success -> {
-                    response.value.cast?.let {
-                        casts = it
+                    response.value.cast?.let { dt ->
+                        viewModelState.update { it.copy(casts = dt, isLoadCredit = false) }
                     }
                 }
                 is ResultWrapper.GenericError -> {}

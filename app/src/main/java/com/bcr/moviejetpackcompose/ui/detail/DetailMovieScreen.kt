@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -13,22 +15,26 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.core.viewmodels.DetailMovieViewModel
+import com.bcr.moviejetpackcompose.core.viewmodels.DetailViewModelState
 import com.bcr.moviejetpackcompose.ui.theme.white
 import com.bcr.moviejetpackcompose.ui.card.CreditPeopleCard
 import com.bcr.moviejetpackcompose.ui.card.LabelRating
 import com.bcr.moviejetpackcompose.ui.card.SimiliarMovieCard
+import com.bcr.moviejetpackcompose.ui.components.PeopleShimmerItem
+import com.bcr.moviejetpackcompose.ui.components.SimiliarShimmerItem
 import com.bcr.moviejetpackcompose.ui.components.TagLabel
 import com.bcr.moviejetpackcompose.ui.theme.appTypography
 import com.bcr.moviejetpackcompose.utils.extensions.price
 import com.google.accompanist.flowlayout.FlowRow
 
 private lateinit var appNavController: NavHostController
-private lateinit var viewmodel: DetailMovieViewModel
+private lateinit var uiState: State<DetailViewModelState>
 
 @Composable
 fun DetailMovieScreen(navController: NavHostController,
                       movie: Movie) {
-    viewmodel = DetailMovieViewModel()
+    val viewmodel = DetailMovieViewModel()
+    uiState = viewmodel.uiState.collectAsState()
     viewmodel.getDetailMovie(movie)
     appNavController = navController
     Surface(
@@ -44,12 +50,14 @@ fun DetailMovieScreen(navController: NavHostController,
 private fun AppScaffold(
     modifier: Modifier = Modifier,
 ) {
-    AppBarScaffold(
+    uiState.value.movie?.getImageBackdrop()?.let {
+        AppBarScaffold(
         navController = appNavController,
-        viewmodel.movie?.getImageBackdrop()!!,
+            it,
         modifier = modifier.fillMaxSize(),
     ) {
         BodyContentMovie()
+      }
     }
 }
 
@@ -60,7 +68,7 @@ fun BodyContentMovie() {
         .background(white)) {
 
         item {
-            viewmodel.movie?.let { movie ->
+            uiState.value.movie?.let { movie ->
                 Column(modifier = Modifier.padding(start = 8.dp, top = 16.dp, end = 16.dp)) {
                     Row(modifier = Modifier
                         .fillMaxWidth()
@@ -89,14 +97,20 @@ fun BodyContentMovie() {
                 .wrapContentHeight(),
                 contentPadding = PaddingValues(16.dp, end = 16.dp)
             ) {
-                itemsIndexed(viewmodel.casts) { index, item ->
-                    CreditPeopleCard(item)
+                if (uiState.value.isLoadCredit) {
+                    repeat(10) {
+                     item { PeopleShimmerItem() }
+                    }
+                } else {
+                    itemsIndexed(uiState.value.casts) { index, item ->
+                        CreditPeopleCard(item)
+                    }
                 }
             }
         }
 
         item {
-            viewmodel.movie?.let { it
+            uiState.value.movie?.let { it
                 Column(modifier = Modifier.padding(
                     start =  16.dp,
                     end = 16.dp,
@@ -137,11 +151,19 @@ fun InfoMovieItem(title: String, value: String) {
 fun SimiliarMovie() {
     val width = LocalConfiguration.current.screenWidthDp - 16
     FlowRow() {
-        repeat(viewmodel.similiarMovies.count()) {
-            Box(modifier = Modifier
-                .width((width / 4).dp)
-                .wrapContentHeight()) {
-                SimiliarMovieCard(width, appNavController, viewmodel.similiarMovies[it])
+        if (uiState.value.isLoadSimiliar) {
+            repeat(10) {
+                SimiliarShimmerItem()
+            }
+        } else {
+            repeat(uiState.value.similiarMovies.count()) {
+                Box(
+                    modifier = Modifier
+                        .width((width / 4).dp)
+                        .wrapContentHeight()
+                ) {
+                    SimiliarMovieCard(width, appNavController, uiState.value.similiarMovies[it])
+                }
             }
         }
     }

@@ -16,8 +16,12 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
-//        buildConfigField("String", "API_KEY", "\"{}\"") // please get apikey from https://www.themoviedb.org/settings/api
+        buildConfigField("String", "API_KEY", "\"{}\"") // please get apikey from https://www.themoviedb.org/settings/api
 
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 
     buildTypes {
@@ -66,6 +70,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-insets:0.24.2-alpha"
     implementation "com.google.accompanist:accompanist-insets-ui:0.24.2-alpha"
     implementation "com.google.accompanist:accompanist-flowlayout:0.24.2-alpha"
+    implementation "com.google.accompanist:accompanist-swiperefresh:0.24.2-alpha"
 
     // lifecycle
     implementation "androidx.lifecycle:lifecycle-common:2.4.1"
