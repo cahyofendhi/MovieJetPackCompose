@@ -64,17 +64,17 @@ private fun Image(
             modifier = Modifier.matchParentSize()
         )
 
-        AnimatedVisibility(
-            visible = when (painter.state) {
-                is ImagePainter.State.Empty,
-                -> true
-                is ImagePainter.State.Success,
-                -> false
-                is ImagePainter.State.Loading,
-                -> true
-                is ImagePainter.State.Error,
-                -> true
-            }
-        ) { placeholder() }
+//        AnimatedVisibility(
+//            visible = when (painter.state) {
+//                is ImagePainter.State.Empty,
+//                -> true
+//                is ImagePainter.State.Success,
+//                -> false
+//                is ImagePainter.State.Loading,
+//                -> true
+//                is ImagePainter.State.Error,
+//                -> true
+//            }
+//        ) { placeholder() }
     }
 }

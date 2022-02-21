@@ -1,32 +1,23 @@
 package com.bcr.moviejetpackcompose.ui.home
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.runtime.Composable
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.material.icons.Icons
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
-import coil.compose.rememberImagePainter
+import com.bcr.moviejetpackcompose.core.model.GroupType
 import com.bcr.moviejetpackcompose.core.viewmodels.HomeViewModel
 import com.bcr.moviejetpackcompose.core.viewmodels.HomeViewModelState
 import com.bcr.moviejetpackcompose.ui.NavigationRoot
@@ -34,9 +25,11 @@ import com.bcr.moviejetpackcompose.ui.card.HMovieCard
 import com.bcr.moviejetpackcompose.ui.card.VMovieCard
 import com.bcr.moviejetpackcompose.ui.components.AppImage
 import com.bcr.moviejetpackcompose.ui.components.HShimmerAnimation
+import com.bcr.moviejetpackcompose.ui.components.SearchButton
 import com.bcr.moviejetpackcompose.ui.components.ShimmerAnimation
 import com.bcr.moviejetpackcompose.ui.theme.appTypography
-import com.bcr.moviejetpackcompose.utils.getMovieImage
+import com.bcr.moviejetpackcompose.ui.theme.white
+import com.bcr.moviejetpackcompose.utils.extensions.isScrolled
 import com.google.accompanist.pager.ExperimentalPagerApi
 
 private lateinit var appNavController: NavHostController
@@ -47,53 +40,44 @@ private lateinit var uiState: State<HomeViewModelState>
 fun HomeScreen(navController: NavHostController?, viewModel: HomeViewModel) {
     uiState = viewModel.uiState.collectAsState()
     navController?.let { appNavController = it }
-    Scaffold() {
-        Column {
-            AppBarHome()
-            ContentHome()
-        }
+    val lazyListState = rememberLazyListState()
+    Scaffold(
+        topBar = { AppBarHome(lazyListState) }
+    ) {
+        ContentHome(lazyListState)
     }
+
 }
 
 @Composable
-fun AppBarHome() {
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .height(58.dp)
-            .background(Color.White),) {
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(16.dp)
-        ) {
-
-            Text(
-                "Movie",
-                style = appTypography.h6,
-                maxLines = 2,
-                modifier = Modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.Start)
-            )
-
-            Icon(
-                Icons.Outlined.Search,
-                contentDescription = "Search",
-                tint = Color.Black,
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .wrapContentWidth(Alignment.End)
-            )
-        }
-
-    }
+fun AppBarHome(lazyListState: LazyListState) {
+    TopAppBar(
+        title = {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "Movie",
+                    style = appTypography.h6.copy(textAlign = TextAlign.Center),
+                )
+            }
+        },
+        navigationIcon = {},
+        actions = { SearchButton(onClick = {
+            appNavController.navigate(NavigationRoot.SearchPage.createRouteWithArguments(GroupType.movie))
+        }) },
+        backgroundColor = white,
+        elevation = if (!lazyListState.isScrolled) 0.dp else 3.dp
+    )
 }
 
 @ExperimentalPagerApi
 @Composable
-fun ContentHome() {
-    LazyColumn(modifier = Modifier
+fun ContentHome(state: LazyListState) {
+    LazyColumn(state = state,
+        modifier = Modifier
         .background(Color.White)
         .fillMaxSize()) {
         item { UpcomingHome() }

@@ -29,10 +29,7 @@ import com.bcr.moviejetpackcompose.core.viewmodels.DetailViewModelState
 import com.bcr.moviejetpackcompose.ui.card.CreditPeopleCard
 import com.bcr.moviejetpackcompose.ui.card.LabelRating
 import com.bcr.moviejetpackcompose.ui.card.SimiliarMovieCard
-import com.bcr.moviejetpackcompose.ui.components.AppImage
-import com.bcr.moviejetpackcompose.ui.components.PeopleShimmerItem
-import com.bcr.moviejetpackcompose.ui.components.SimiliarShimmerItem
-import com.bcr.moviejetpackcompose.ui.components.TagLabel
+import com.bcr.moviejetpackcompose.ui.components.*
 import com.bcr.moviejetpackcompose.ui.theme.appTypography
 import com.bcr.moviejetpackcompose.ui.theme.primaryBlack
 import com.bcr.moviejetpackcompose.ui.theme.white
@@ -114,7 +111,7 @@ fun DetailTVScreen(navController: NavHostController,
                 }
                 TopAppBar(
                     backgroundColor = Color.Transparent,
-                    navigationIcon = { BackButton(navController = appNavController) },
+                    navigationIcon = { BackButton(onClick = { navController.popBackStack() }) },
                     title = {
                         val progressReversed = 1f - progress
                         Text(text = "Detail Movie",

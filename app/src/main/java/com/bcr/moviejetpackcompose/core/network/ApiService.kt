@@ -25,6 +25,14 @@ interface ApiService {
         @Query("page") page: Int = 1,
     ): MovieResponse
 
+    @GET("search/{group}")
+    suspend fun searchMovies(
+        @Path("group") group: String,
+        @Query("query") query: String = "a",
+        @Query("page") page: Int = 1,
+        @Query("api_key") apiKey: String = API_KEY,
+    ): MovieResponse
+
     @GET("{group}/{id}")
     suspend fun getDetailMovie(
         @Path("group") group: String,

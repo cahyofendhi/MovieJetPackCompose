@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bcr.moviejetpackcompose.ui.components.AppImage
+import com.bcr.moviejetpackcompose.ui.components.BackButton
 import com.bcr.moviejetpackcompose.ui.components.MovieAppBar
 import com.bcr.moviejetpackcompose.ui.theme.appTypography
 import com.bcr.moviejetpackcompose.ui.theme.primaryBlack
@@ -60,20 +61,6 @@ fun AppBarScaffold(
 }
 
 @Composable
-fun BackButton(navController: NavHostController) {
-    Icon(
-        Icons.Outlined.ArrowBack,
-        contentDescription = "back",
-        tint = Color.White,
-        modifier = Modifier
-            .padding(horizontal = 5.dp)
-            .height(25.dp)
-            .width(25.dp)
-            .clickable { navController.popBackStack() }
-    )
-}
-
-@Composable
 private fun CollapsedAppBar(
     navController: NavHostController,
     modifier: Modifier = Modifier,
@@ -90,7 +77,7 @@ private fun CollapsedAppBar(
                 style = appTypography.body1
             )
         },
-        navigationIcon = { BackButton(navController = navController) },
+        navigationIcon = { BackButton(onClick = { navController.popBackStack() }) },
         actions = {}
     )
 }
@@ -110,8 +97,8 @@ private fun AppBarContent(
         AppImage(
             url = url,
             modifier = Modifier
-            .fillMaxWidth()
-            .height(300.dp)
+                .fillMaxWidth()
+                .height(300.dp)
         )
     }
 }
