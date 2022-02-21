@@ -14,4 +14,3 @@ add api key themoviedb to `app/build.gradle`, attribute `API_KEY` line 19
 * [OkHttp](https://square.github.io/okhttp/)
 * [Coil](https://coil-kt.github.io/coil/)
 * [Toolbar Compose](https://github.com/onebone/compose-collapsing-toolbar)
-* [Toolbar Compose](https://github.com/onebone/compose-collapsing-toolbar)
