@@ -60,12 +60,10 @@ fun AppBarTV(lazyListState: LazyListState) {
                 )
             }
         },
-        navigationIcon = {
-           appNavController.navigate(
-                NavigationRoot.SearchPage.createRouteWithArguments(
-                    GroupType.tv))
-        },
-        actions = { SearchButton(onClick = {}) },
+        navigationIcon = {},
+        actions = { SearchButton(onClick = {
+            appNavController.navigate(NavigationRoot.SearchPage.createRouteWithArguments(GroupType.tv))
+        }) },
         backgroundColor = white,
         elevation = if (!lazyListState.isScrolled) 0.dp else 3.dp
     )
