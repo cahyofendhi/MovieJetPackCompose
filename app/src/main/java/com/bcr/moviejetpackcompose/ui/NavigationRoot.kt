@@ -5,6 +5,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.bcr.moviejetpackcompose.R
+import com.bcr.moviejetpackcompose.core.model.CategoryType
+import com.bcr.moviejetpackcompose.core.model.GroupType
 import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.utils.extensions.fromJson
 import com.bcr.moviejetpackcompose.utils.extensions.toJson
@@ -59,6 +61,27 @@ sealed class NavigationRoot(var route: String, var icon: Int?, var title: String
                 return it.fromJson(Movie::class.java)
             }
             return null
+        }
+
+    }
+
+    object SearchPage : NavigationRoot(
+        "${Keys.routeName}?${ Keys.type }={${Keys.type}}", null, "Search Page"
+    ) {
+        object Keys {
+            const val routeName = "search-page"
+            const val type = "category-type"
+        }
+        val arguments = listOf(
+            navArgument(Keys.type) { type = NavType.StringType }
+        )
+
+        fun createRouteWithArguments(type: GroupType): String {
+            return Keys.routeName.plus("?${Keys.type}=${type.type}")
+        }
+
+        fun getArguments(argument :Bundle): String? {
+            return argument.getString(Keys.type)
         }
 
     }

@@ -27,6 +27,7 @@ import com.bcr.moviejetpackcompose.core.viewmodels.TVViewModel
 import com.bcr.moviejetpackcompose.ui.detail.DetailMovieScreen
 import com.bcr.moviejetpackcompose.ui.detail.DetailTVScreen
 import com.bcr.moviejetpackcompose.ui.home.HomeScreen
+import com.bcr.moviejetpackcompose.ui.search.SearchScreen
 import com.bcr.moviejetpackcompose.ui.theme.AppTheme
 import com.bcr.moviejetpackcompose.ui.theme.blueYoung
 import com.bcr.moviejetpackcompose.ui.tv.TVScreen
@@ -99,6 +100,14 @@ fun NavigationGraph(navController: NavHostController,
             val argument = requireNotNull(backStackEntry.arguments)
             NavigationRoot.TVDetail.getArguments(argument)?.let {
                 DetailTVScreen(navController = navController, movie = it)
+            }
+        }
+        composable(NavigationRoot.SearchPage.route,
+            arguments = NavigationRoot.SearchPage.arguments
+        ) { backStackEntry ->
+            val argument = requireNotNull(backStackEntry.arguments)
+            NavigationRoot.SearchPage.getArguments(argument)?.let {
+                SearchScreen(navController = navController, type = it, onBack = { navController.popBackStack() })
             }
         }
     }

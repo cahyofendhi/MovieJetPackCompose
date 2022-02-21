@@ -70,6 +70,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-insets:0.24.2-alpha"
     implementation "com.google.accompanist:accompanist-insets-ui:0.24.2-alpha"
     implementation "com.google.accompanist:accompanist-flowlayout:0.24.2-alpha"
+    implementation "com.google.accompanist:accompanist-swiperefresh:0.24.2-alpha"
 
     // lifecycle
     implementation "androidx.lifecycle:lifecycle-common:2.4.1"
