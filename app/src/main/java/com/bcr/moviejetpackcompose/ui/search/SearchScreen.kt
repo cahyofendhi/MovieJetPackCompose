@@ -1,20 +1,25 @@
 package com.bcr.moviejetpackcompose.ui.search
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.bcr.moviejetpackcompose.core.model.GroupType
 import com.bcr.moviejetpackcompose.core.viewmodels.SearchViewModel
 import com.bcr.moviejetpackcompose.core.viewmodels.SearchViewModelState
 import com.bcr.moviejetpackcompose.ui.card.VMovieCard
 import com.bcr.moviejetpackcompose.ui.components.BackButton
 import com.bcr.moviejetpackcompose.ui.components.InfiniteList
+import com.bcr.moviejetpackcompose.ui.components.field.SearchView
 import com.bcr.moviejetpackcompose.ui.theme.appTypography
 import com.bcr.moviejetpackcompose.ui.theme.primaryBlack
 import com.bcr.moviejetpackcompose.ui.theme.white
@@ -26,9 +31,10 @@ private lateinit var appNavController: NavController
 @Composable
 fun SearchScreen(navController: NavController, type: String, onBack:() -> Unit) {
     appNavController = navController
-    viewmodel = SearchViewModel()
+    viewmodel = SearchViewModel(type)
     uiState = viewmodel.uiState.collectAsState()
     viewmodel.searchMovies(false, "a")
+    val textState = remember { mutableStateOf(TextFieldValue("")) }
     Scaffold(topBar = {
         TopAppBar(
             title = {
@@ -48,7 +54,15 @@ fun SearchScreen(navController: NavController, type: String, onBack:() -> Unit) 
             elevation = 3.dp
         )
     }, backgroundColor = white) {
-        ContentSearch()
+        Column() {
+            Card(modifier = Modifier
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp)) {
+               SearchView(state = textState, onSubmit = {
+                   viewmodel.searchMovies(true, textState.value.text)
+               })
+            }
+            ContentSearch()
+        }
     }
 }
 
@@ -61,7 +75,7 @@ fun ContentSearch() {
          },
         onLoadMore = {  viewmodel.getMovies() },
         data = uiState.value.movies,
-        content = { _, item ->  VMovieCard(navController = appNavController, movie = item)},
+        content = { _, item ->  VMovieCard(navController = appNavController, movie = item, isMovie = viewmodel.type == GroupType.movie.type)},
         isLoadmore = uiState.value.isLoading,
         isRefresh =  uiState.value.isRefresh,
     )

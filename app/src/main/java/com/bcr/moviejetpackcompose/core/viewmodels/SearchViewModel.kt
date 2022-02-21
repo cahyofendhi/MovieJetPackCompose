@@ -28,7 +28,7 @@ data class SearchViewModelState(
     )
 }
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel(val type: String) : ViewModel() {
     private var repository: MovieRepositoryImpl = MovieRepositoryImpl()
 
     private val viewModelState = MutableStateFlow(SearchViewModelState())
@@ -52,7 +52,7 @@ class SearchViewModel : ViewModel() {
             viewModelState.update { it.copy(isLoading = true) }
         }
         viewModelScope.launch {
-            val response = repository.searchMovies(GroupType.movie, viewModelState.value.keyword, viewModelState.value.nextPage)
+            val response = repository.searchMovies(type, viewModelState.value.keyword, viewModelState.value.nextPage)
             when(response) {
                 is ResultWrapper.Success -> {
                     var movies: List<Movie>

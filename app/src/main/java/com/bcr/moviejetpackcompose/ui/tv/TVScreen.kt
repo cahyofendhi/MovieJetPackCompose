@@ -16,9 +16,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.bcr.moviejetpackcompose.core.model.GroupType
 import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.core.viewmodels.TVViewModel
 import com.bcr.moviejetpackcompose.core.viewmodels.TVViewModelState
+import com.bcr.moviejetpackcompose.ui.NavigationRoot
 import com.bcr.moviejetpackcompose.ui.card.HMovieCard
 import com.bcr.moviejetpackcompose.ui.components.HShimmerAnimation
 import com.bcr.moviejetpackcompose.ui.components.SearchButton
@@ -58,7 +60,11 @@ fun AppBarTV(lazyListState: LazyListState) {
                 )
             }
         },
-        navigationIcon = {},
+        navigationIcon = {
+           appNavController.navigate(
+                NavigationRoot.SearchPage.createRouteWithArguments(
+                    GroupType.tv))
+        },
         actions = { SearchButton(onClick = {}) },
         backgroundColor = white,
         elevation = if (!lazyListState.isScrolled) 0.dp else 3.dp

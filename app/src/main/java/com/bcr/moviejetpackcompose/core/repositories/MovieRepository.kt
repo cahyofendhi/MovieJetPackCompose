@@ -16,7 +16,7 @@ interface MovieRepository {
 
     suspend fun getCrewMovie(group: GroupType, id: Int): ResultWrapper<CrewResponse>
 
-    suspend fun searchMovies(group: GroupType, keyword: String, page: Int): ResultWrapper<MovieResponse>
+    suspend fun searchMovies(group: String, keyword: String, page: Int): ResultWrapper<MovieResponse>
 
 }
 
@@ -44,11 +44,11 @@ class MovieRepositoryImpl(private val service: ApiService = ApiService.getInstan
     }
 
     override suspend fun searchMovies(
-        group: GroupType,
+        group: String,
         keyword: String,
         page: Int
     ): ResultWrapper<MovieResponse> {
-        return safeApiCall(dispatcher) { service.searchMovies(group.type, keyword, page) }
+        return safeApiCall(dispatcher) { service.searchMovies(group, keyword, page) }
     }
 
 }
