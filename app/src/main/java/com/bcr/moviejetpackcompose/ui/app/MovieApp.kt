@@ -146,7 +146,7 @@ fun NavGraphBuilder.addHomeGraph(appState: MovieAppState) {
         TVScreen(tvVM, onSearch = {
             appState.navigateToPage(MainNavigation.SearchPage.createRouteWithArguments(GroupType.tv), backStack)
         }, onPressed = {
-            appState.navigateToPage(MainNavigation.MovieDetail.createRouteWithArguments(it), backStack)
+            appState.navigateToPage(MainNavigation.TVDetail.createRouteWithArguments(it), backStack)
         })
     }
 }

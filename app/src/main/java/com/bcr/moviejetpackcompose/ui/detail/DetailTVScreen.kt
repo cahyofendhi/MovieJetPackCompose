@@ -111,7 +111,7 @@ fun DetailTVScreen(viewmodel: DetailTVViewModel,
                     navigationIcon = { BackButton(onClick = onBack) },
                     title = {
                         val progressReversed = 1f - progress
-                        Text(text = "Detail Movie",
+                        Text(text = uiState.value.movie?.getTitleMovie() ?: "Detail Movie",
                             style = appTypography.body1,
                             color = Color.White,
                             modifier = Modifier.alpha(progressReversed.configureProgress(0.5f))

@@ -38,7 +38,10 @@ fun DetailMovieScreen(viewModel: DetailMovieViewModel,
         modifier = Modifier
             .fillMaxSize()
     ) {
-        AppScaffold( modifier = Modifier.fillMaxSize(), onBack, onPressed)
+        AppScaffold(
+            modifier = Modifier.fillMaxSize(),
+            onBack,
+            onPressed)
     }
 }
 
@@ -50,6 +53,7 @@ private fun AppScaffold(
 ) {
     uiState.value.movie?.getImageBackdrop()?.let {
         AppBarScaffold(it,
+            title = uiState.value.movie?.getTitleMovie() ?: "Detail Movie",
             onBack = onBack,
             modifier = modifier.fillMaxSize(),
     ) {
