@@ -4,16 +4,12 @@ import androidx.annotation.FloatRange
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.bcr.moviejetpackcompose.ui.components.AppImage
 import com.bcr.moviejetpackcompose.ui.components.BackButton
 import com.bcr.moviejetpackcompose.ui.components.MovieAppBar
@@ -28,8 +24,8 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
 @Composable
 fun AppBarScaffold(
-    navController: NavHostController,
     url: String,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
@@ -51,9 +47,9 @@ fun AppBarScaffold(
                 AppBarContent( progress = progress, url = url)
             }
             CollapsedAppBar(
-                navController = navController,
                 modifier = Modifier.clickable(onClick = { }),
                 progress = progress,
+                onBack = onBack,
             )
         },
         body = content
@@ -62,9 +58,9 @@ fun AppBarScaffold(
 
 @Composable
 private fun CollapsedAppBar(
-    navController: NavHostController,
     modifier: Modifier = Modifier,
     @FloatRange(from = 0.0, to = 1.0) progress: Float,
+    onBack: () -> Unit,
 ) {
     val progressReversed = 1f - progress
     MovieAppBar(
@@ -77,7 +73,7 @@ private fun CollapsedAppBar(
                 style = appTypography.body1
             )
         },
-        navigationIcon = { BackButton(onClick = { navController.popBackStack() }) },
+        navigationIcon = { BackButton(onClick = onBack) },
         actions = {}
     )
 }
