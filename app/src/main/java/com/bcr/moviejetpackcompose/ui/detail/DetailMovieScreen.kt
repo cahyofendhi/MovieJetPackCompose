@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.core.viewmodels.DetailMovieViewModel
 import com.bcr.moviejetpackcompose.core.viewmodels.DetailViewModelState
@@ -27,42 +26,40 @@ import com.bcr.moviejetpackcompose.ui.theme.appTypography
 import com.bcr.moviejetpackcompose.utils.extensions.price
 import com.google.accompanist.flowlayout.FlowRow
 
-private lateinit var appNavController: NavHostController
 private lateinit var uiState: State<DetailViewModelState>
 
 @Composable
-fun DetailMovieScreen(navController: NavHostController,
-                      movie: Movie) {
-    val viewmodel = DetailMovieViewModel()
-    uiState = viewmodel.uiState.collectAsState()
-    viewmodel.getDetailMovie(movie)
-    appNavController = navController
+fun DetailMovieScreen(viewModel: DetailMovieViewModel,
+                      onBack: () -> Unit,
+                      onPressed: (Movie) -> Unit) {
+    uiState = viewModel.uiState.collectAsState()
     Surface(
         color = Color.White,
         modifier = Modifier
             .fillMaxSize()
     ) {
-        AppScaffold( modifier = Modifier.fillMaxSize() )
+        AppScaffold( modifier = Modifier.fillMaxSize(), onBack, onPressed)
     }
 }
 
 @Composable
 private fun AppScaffold(
     modifier: Modifier = Modifier,
+    onBack: () -> Unit,
+    onPressed: (Movie) -> Unit
 ) {
     uiState.value.movie?.getImageBackdrop()?.let {
-        AppBarScaffold(
-        navController = appNavController,
-            it,
-        modifier = modifier.fillMaxSize(),
+        AppBarScaffold(it,
+            onBack = onBack,
+            modifier = modifier.fillMaxSize(),
     ) {
-        BodyContentMovie()
+        BodyContentMovie(onPressed = onPressed)
       }
     }
 }
 
 @Composable
-fun BodyContentMovie() {
+fun BodyContentMovie(onPressed: (Movie) -> Unit) {
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .background(white)) {
@@ -131,7 +128,7 @@ fun BodyContentMovie() {
                 Text(text = "Similiar Movie",
                     style = appTypography.subtitle2,
                     modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp))
-                SimiliarMovie()
+                SimiliarMovie(onPressed = onPressed)
             }
         }
 
@@ -148,7 +145,7 @@ fun InfoMovieItem(title: String, value: String) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SimiliarMovie() {
+fun SimiliarMovie(onPressed: (Movie) -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp - 16
     FlowRow() {
         if (uiState.value.isLoadSimiliar) {
@@ -162,7 +159,9 @@ fun SimiliarMovie() {
                         .width((width / 4).dp)
                         .wrapContentHeight()
                 ) {
-                    SimiliarMovieCard(width, appNavController, uiState.value.similiarMovies[it])
+                    SimiliarMovieCard(width, uiState.value.similiarMovies[it], onPressed = {
+                        onPressed(uiState.value.similiarMovies[it])
+                    })
                 }
             }
         }
