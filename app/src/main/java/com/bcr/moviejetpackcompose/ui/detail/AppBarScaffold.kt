@@ -25,6 +25,7 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 @Composable
 fun AppBarScaffold(
     url: String,
+    title: String,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
@@ -47,6 +48,7 @@ fun AppBarScaffold(
                 AppBarContent( progress = progress, url = url)
             }
             CollapsedAppBar(
+                title = title,
                 modifier = Modifier.clickable(onClick = { }),
                 progress = progress,
                 onBack = onBack,
@@ -58,6 +60,7 @@ fun AppBarScaffold(
 
 @Composable
 private fun CollapsedAppBar(
+    title: String,
     modifier: Modifier = Modifier,
     @FloatRange(from = 0.0, to = 1.0) progress: Float,
     onBack: () -> Unit,
@@ -68,7 +71,7 @@ private fun CollapsedAppBar(
         title = {
             Text(
                 modifier = Modifier.alpha(progressReversed.configureProgress(0.5f)),
-                text = "Detail Movie",
+                text = title,
                 color = white,
                 style = appTypography.body1
             )
