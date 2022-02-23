@@ -16,27 +16,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.bcr.moviejetpackcompose.core.model.Crew
 import com.bcr.moviejetpackcompose.core.model.Movie
-import com.bcr.moviejetpackcompose.ui.NavigationRoot
 import com.bcr.moviejetpackcompose.ui.components.AppImage
 import com.bcr.moviejetpackcompose.ui.theme.*
 
 @Composable
-fun HMovieCard(navController: NavController, movie: Movie, isMovie: Boolean = true) {
+fun HMovieCard(movie: Movie, onPressed: () -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
     Box(modifier = Modifier
         .padding(end = 16.dp)
         .wrapContentHeight()
         .width((width / 3).dp)
-        .clickable {
-            if (isMovie) {
-                navController.navigate(NavigationRoot.MovieDetail.createRouteWithArguments(movie))
-            } else {
-                navController.navigate(NavigationRoot.TVDetail.createRouteWithArguments(movie))
-            }
-        }) {
+        .clickable { onPressed() }) {
 
         Column {
             AppImage(url = movie.getImageBackdrop(),
@@ -63,22 +55,15 @@ fun HMovieCard(navController: NavController, movie: Movie, isMovie: Boolean = tr
 }
 
 @Composable
-fun VMovieCard(navController: NavController, movie: Movie, isMovie: Boolean = true) {
+fun VMovieCard(movie: Movie, onPressed: () -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
     Box(modifier = Modifier
         .padding(bottom = 16.dp, start = 16.dp, end = 16.dp)
         .wrapContentHeight()
-        .clickable {
-            if (isMovie) {
-                navController.navigate(NavigationRoot.MovieDetail.createRouteWithArguments(movie))
-            } else {
-                navController.navigate(NavigationRoot.TVDetail.createRouteWithArguments(movie))
-            }
-        }) {
-
-        Row {
-            AppImage(url = movie.getImageBackdrop(),
-                modifier = Modifier
+        .clickable { onPressed() }) {
+            Row {
+                AppImage(url = movie.getImageBackdrop(),
+                    modifier = Modifier
                     .width((width / 3 - 10).dp)
                     .height((width / 2.7).dp)
                     .clip(RoundedCornerShape(10.dp))
@@ -107,7 +92,6 @@ fun VMovieCard(navController: NavController, movie: Movie, isMovie: Boolean = tr
             }
 
         }
-
     }
 }
 
@@ -162,19 +146,13 @@ fun CreditPeopleCard(crew: Crew) {
 }
 
 @Composable
-fun SimiliarMovieCard(width: Int, navController: NavController, movie: Movie, isMovie: Boolean = true) {
+fun SimiliarMovieCard(width: Int, movie: Movie, onPressed: () -> Unit) {
     Column(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
             .wrapContentHeight()
-            .clickable {
-                if (isMovie) {
-                    navController.navigate(NavigationRoot.MovieDetail.createRouteWithArguments(movie))
-                } else {
-                    navController.navigate(NavigationRoot.TVDetail.createRouteWithArguments(movie))
-                }
-            },
+            .clickable { onPressed() },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AppImage(url = movie.getImageBackdrop(),

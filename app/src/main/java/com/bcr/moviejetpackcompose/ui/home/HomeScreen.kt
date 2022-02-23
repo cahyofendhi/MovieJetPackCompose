@@ -16,11 +16,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.navigation.NavHostController
-import com.bcr.moviejetpackcompose.core.model.GroupType
+import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.core.viewmodels.HomeViewModel
 import com.bcr.moviejetpackcompose.core.viewmodels.HomeViewModelState
-import com.bcr.moviejetpackcompose.ui.NavigationRoot
 import com.bcr.moviejetpackcompose.ui.card.HMovieCard
 import com.bcr.moviejetpackcompose.ui.card.VMovieCard
 import com.bcr.moviejetpackcompose.ui.components.AppImage
@@ -32,25 +30,25 @@ import com.bcr.moviejetpackcompose.ui.theme.white
 import com.bcr.moviejetpackcompose.utils.extensions.isScrolled
 import com.google.accompanist.pager.ExperimentalPagerApi
 
-private lateinit var appNavController: NavHostController
 private lateinit var uiState: State<HomeViewModelState>
 
 @ExperimentalPagerApi
 @Composable
-fun HomeScreen(navController: NavHostController?, viewModel: HomeViewModel) {
+fun HomeScreen(viewModel: HomeViewModel,
+               onSearch: () -> Unit,
+               onPressed: (Movie) -> Unit) {
     uiState = viewModel.uiState.collectAsState()
-    navController?.let { appNavController = it }
     val lazyListState = rememberLazyListState()
     Scaffold(
-        topBar = { AppBarHome(lazyListState) }
+        topBar = { AppBarHome(lazyListState, onSearch) }
     ) {
-        ContentHome(lazyListState)
+        ContentHome(lazyListState, onPressed)
     }
 
 }
 
 @Composable
-fun AppBarHome(lazyListState: LazyListState) {
+fun AppBarHome(lazyListState: LazyListState, onSearch: () -> Unit) {
     TopAppBar(
         title = {
             Box(modifier = Modifier
@@ -65,9 +63,7 @@ fun AppBarHome(lazyListState: LazyListState) {
             }
         },
         navigationIcon = {},
-        actions = { SearchButton(onClick = {
-            appNavController.navigate(NavigationRoot.SearchPage.createRouteWithArguments(GroupType.movie))
-        }) },
+        actions = { SearchButton(onClick = { onSearch() }) },
         backgroundColor = white,
         elevation = if (!lazyListState.isScrolled) 0.dp else 3.dp
     )
@@ -75,13 +71,13 @@ fun AppBarHome(lazyListState: LazyListState) {
 
 @ExperimentalPagerApi
 @Composable
-fun ContentHome(state: LazyListState) {
+fun ContentHome(state: LazyListState, onPressed: (Movie) -> Unit) {
     LazyColumn(state = state,
         modifier = Modifier
         .background(Color.White)
         .fillMaxSize()) {
-        item { UpcomingHome() }
-        item { PopularMovieHome() }
+        item { UpcomingHome(onPressed) }
+        item { PopularMovieHome(onPressed) }
 
         item {
             Spacer(modifier = Modifier.padding(16.dp))
@@ -99,7 +95,7 @@ fun ContentHome(state: LazyListState) {
             }
         } else {
             itemsIndexed(uiState.value.upcomingMovies) { index, item ->
-                VMovieCard(appNavController, item)
+                VMovieCard(item, onPressed = { onPressed(item) })
             }
         }
 
@@ -111,7 +107,7 @@ fun ContentHome(state: LazyListState) {
 
 @ExperimentalPagerApi
 @Composable
-fun UpcomingHome() {
+fun UpcomingHome(onPressed: (Movie) -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp / 2.5
 
     LazyRow(
@@ -136,11 +132,7 @@ fun UpcomingHome() {
                         .fillMaxHeight()
                         .width(width.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .clickable {
-                            appNavController.navigate(
-                                NavigationRoot.MovieDetail.createRouteWithArguments(item)
-                            )
-                        }
+                        .clickable { onPressed(item) }
                 )
             }
         }
@@ -148,7 +140,7 @@ fun UpcomingHome() {
 }
 
 @Composable
-fun PopularMovieHome() {
+fun PopularMovieHome(onPressed: (Movie) -> Unit) {
     Column {
         Text(text = "Popular Movie",
             modifier = Modifier.padding(16.dp),
@@ -166,7 +158,7 @@ fun PopularMovieHome() {
             ) {
 
                 itemsIndexed(uiState.value.popularMovies) { _, item ->
-                    HMovieCard(navController = appNavController, movie = item)
+                    HMovieCard(movie = item, onPressed = { onPressed(item) })
                 }
 
             }
@@ -178,5 +170,5 @@ fun PopularMovieHome() {
 @ExperimentalPagerApi
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(null, HomeViewModel())
+    HomeScreen(HomeViewModel(), onSearch = {}, onPressed = {})
 }

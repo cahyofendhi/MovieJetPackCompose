@@ -41,16 +41,13 @@ import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
-private lateinit var appNavController: NavHostController
 private lateinit var uiState: State<DetailViewModelState>
 
 @Composable
-fun DetailTVScreen(navController: NavHostController,
-                   movie: Movie) {
-    val viewmodel = DetailTVViewModel()
+fun DetailTVScreen(viewmodel: DetailTVViewModel,
+                   onBack: () -> Unit,
+                   onPressed: (Movie) -> Unit) {
     uiState = viewmodel.uiState.collectAsState()
-    viewmodel.getDetailMovie(movie)
-    appNavController = navController
     Surface(
         color = Color.White,
         modifier = Modifier.fillMaxSize()
@@ -111,7 +108,7 @@ fun DetailTVScreen(navController: NavHostController,
                 }
                 TopAppBar(
                     backgroundColor = Color.Transparent,
-                    navigationIcon = { BackButton(onClick = { navController.popBackStack() }) },
+                    navigationIcon = { BackButton(onClick = onBack) },
                     title = {
                         val progressReversed = 1f - progress
                         Text(text = "Detail Movie",
@@ -123,13 +120,13 @@ fun DetailTVScreen(navController: NavHostController,
                     elevation = 0.dp
                 )
             },
-            body = { TVContent() })
+            body = { TVContent(onPressed) })
 
     }
 }
 
 @Composable
-private fun TVContent() {
+private fun TVContent(onPressed: (Movie) -> Unit) {
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .background(white)) {
@@ -192,17 +189,16 @@ private fun TVContent() {
                 Text(text = "Similiar Movie",
                     style = appTypography.subtitle2,
                     modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp))
-                SimiliarMovieTV()
+                SimiliarMovieTV(onPressed)
             }
         }
 
     }
 }
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun SimiliarMovieTV() {
+private fun SimiliarMovieTV(onPressed: (Movie) -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp - 16
     FlowRow() {
         if (uiState.value.isLoadSimiliar) {
@@ -218,9 +214,8 @@ private fun SimiliarMovieTV() {
                 ) {
                     SimiliarMovieCard(
                         width,
-                        appNavController,
                         uiState.value.similiarMovies[it],
-                        false
+                        onPressed = { onPressed(uiState.value.similiarMovies[it]) },
                     )
                 }
             }

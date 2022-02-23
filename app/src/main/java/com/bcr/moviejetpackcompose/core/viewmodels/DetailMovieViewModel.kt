@@ -1,7 +1,11 @@
 package com.bcr.moviejetpackcompose.core.viewmodels
 
+import android.os.Bundle
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.savedstate.SavedStateRegistryOwner
 import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.core.network.ResultWrapper
 import com.bcr.moviejetpackcompose.core.repositories.MovieRepositoryImpl
@@ -27,7 +31,7 @@ data class DetailViewModelState(
         )
 }
 
-class DetailMovieViewModel: ViewModel() {
+class DetailMovieViewModel(val movie: Movie?): ViewModel() {
 
     private var repository: MovieRepositoryImpl = MovieRepositoryImpl()
     private val viewModelState = MutableStateFlow(DetailViewModelState())
@@ -40,7 +44,13 @@ class DetailMovieViewModel: ViewModel() {
             viewModelState.value.toUiState()
         )
 
-    fun getDetailMovie(data: Movie) {
+    init {
+        movie?.let {
+            getDetailMovie(it)
+        }
+    }
+
+    private fun getDetailMovie(data: Movie) {
         viewModelState.update { it.copy(movie = data) }
         data.id?.let { id ->
             getMovie(id)
@@ -90,6 +100,24 @@ class DetailMovieViewModel: ViewModel() {
                 is ResultWrapper.NetworkError -> {}
             }
         }
+    }
+
+    companion object {
+        fun provideFactory(
+            movie: Movie,
+            owner: SavedStateRegistryOwner,
+            defaultArgs: Bundle? = null,
+        ): AbstractSavedStateViewModelFactory =
+            object : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(
+                    key: String,
+                    modelClass: Class<T>,
+                    handle: SavedStateHandle
+                ): T {
+                    return DetailMovieViewModel(movie) as T
+                }
+            }
     }
 
 }

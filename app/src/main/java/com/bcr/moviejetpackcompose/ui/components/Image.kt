@@ -22,7 +22,10 @@ import com.bcr.moviejetpackcompose.ui.theme.gray
 @Composable
 fun AppImage(url: String, modifier: Modifier) {
     Image(
-        painter = rememberImagePainter(url),
+        painter = rememberImagePainter(
+            data = url,
+            builder = { crossfade(true)}
+        ),
         placeholder = { Placeholder(modifier = modifier) },
         contentDescription = null,
         contentScale = ContentScale.Crop,
@@ -54,6 +57,9 @@ private fun Image(
     colorFilter: ColorFilter? = null,
 ) {
     Box(modifier) {
+
+        placeholder()
+
         Image(
             painter = painter,
             contentDescription = contentDescription,
@@ -63,18 +69,5 @@ private fun Image(
             colorFilter = colorFilter,
             modifier = Modifier.matchParentSize()
         )
-
-//        AnimatedVisibility(
-//            visible = when (painter.state) {
-//                is ImagePainter.State.Empty,
-//                -> true
-//                is ImagePainter.State.Success,
-//                -> false
-//                is ImagePainter.State.Loading,
-//                -> true
-//                is ImagePainter.State.Error,
-//                -> true
-//            }
-//        ) { placeholder() }
     }
 }

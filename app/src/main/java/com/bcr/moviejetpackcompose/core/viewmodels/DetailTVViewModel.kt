@@ -1,7 +1,11 @@
 package com.bcr.moviejetpackcompose.core.viewmodels
 
+import android.os.Bundle
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.savedstate.SavedStateRegistryOwner
 import com.bcr.moviejetpackcompose.core.model.GroupType
 import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.core.network.ResultWrapper
@@ -9,7 +13,7 @@ import com.bcr.moviejetpackcompose.core.repositories.MovieRepositoryImpl
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class DetailTVViewModel: ViewModel() {
+class DetailTVViewModel(val movie: Movie): ViewModel() {
 
     private var repository: MovieRepositoryImpl = MovieRepositoryImpl()
     private val viewModelState = MutableStateFlow(DetailViewModelState())
@@ -22,8 +26,11 @@ class DetailTVViewModel: ViewModel() {
             viewModelState.value.toUiState()
         )
 
+    init {
+        getDetailMovie(movie)
+    }
 
-    fun getDetailMovie(data: Movie) {
+    private fun getDetailMovie(data: Movie) {
         viewModelState.update { it.copy(movie = data) }
         data.id?.let { id ->
             getMovie(id)
@@ -72,6 +79,24 @@ class DetailTVViewModel: ViewModel() {
                 is ResultWrapper.NetworkError -> {}
             }
         }
+    }
+
+    companion object {
+        fun provideFactory(
+            movie: Movie,
+            owner: SavedStateRegistryOwner,
+            defaultArgs: Bundle? = null,
+        ): AbstractSavedStateViewModelFactory =
+            object : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(
+                    key: String,
+                    modelClass: Class<T>,
+                    handle: SavedStateHandle
+                ): T {
+                    return DetailTVViewModel(movie) as T
+                }
+            }
     }
 
 }

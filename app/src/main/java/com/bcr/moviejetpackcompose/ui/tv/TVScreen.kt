@@ -15,12 +15,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import com.bcr.moviejetpackcompose.core.model.GroupType
 import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.core.viewmodels.TVViewModel
 import com.bcr.moviejetpackcompose.core.viewmodels.TVViewModelState
-import com.bcr.moviejetpackcompose.ui.NavigationRoot
 import com.bcr.moviejetpackcompose.ui.card.HMovieCard
 import com.bcr.moviejetpackcompose.ui.components.HShimmerAnimation
 import com.bcr.moviejetpackcompose.ui.components.SearchButton
@@ -29,24 +26,24 @@ import com.bcr.moviejetpackcompose.ui.theme.white
 import com.bcr.moviejetpackcompose.utils.extensions.isScrolled
 import com.google.accompanist.pager.ExperimentalPagerApi
 
-private lateinit var appNavController: NavHostController
 private lateinit var uiState: State<TVViewModelState>
 
 @ExperimentalPagerApi
 @Composable
-fun TVScreen(navController: NavHostController?, viewModel: TVViewModel) {
+fun TVScreen(viewModel: TVViewModel,
+             onSearch: () -> Unit,
+             onPressed: (Movie) -> Unit) {
     uiState = viewModel.uiState.collectAsState()
-    navController?.let { appNavController = navController }
     val lazyListState = rememberLazyListState()
     Scaffold(
-        topBar = { AppBarTV(lazyListState = lazyListState) }
+        topBar = { AppBarTV(lazyListState = lazyListState, onSearch) }
     ) {
-        ContentTV(lazyListState)
+        ContentTV(lazyListState, onPressed)
     }
 }
 
 @Composable
-fun AppBarTV(lazyListState: LazyListState) {
+fun AppBarTV(lazyListState: LazyListState, onSearch: () -> Unit) {
     TopAppBar(
         title = {
             Box(modifier = Modifier
@@ -61,9 +58,7 @@ fun AppBarTV(lazyListState: LazyListState) {
             }
         },
         navigationIcon = {},
-        actions = { SearchButton(onClick = {
-            appNavController.navigate(NavigationRoot.SearchPage.createRouteWithArguments(GroupType.tv))
-        }) },
+        actions = { SearchButton(onClick =  onSearch ) },
         backgroundColor = white,
         elevation = if (!lazyListState.isScrolled) 0.dp else 3.dp
     )
@@ -71,7 +66,8 @@ fun AppBarTV(lazyListState: LazyListState) {
 
 @ExperimentalPagerApi
 @Composable
-fun ContentTV(lazyListState: LazyListState) {
+fun ContentTV(lazyListState: LazyListState,
+              onPressed: (Movie) -> Unit) {
     LazyColumn(state = lazyListState,
         modifier = Modifier
             .background(Color.White)
@@ -80,7 +76,7 @@ fun ContentTV(lazyListState: LazyListState) {
             if (uiState.value.isLoadPopular) {
                 HShimmerAnimation()
             } else {
-                PopularMovieTV("Popular", uiState.value.popularMovies)
+                PopularMovieTV("Popular", uiState.value.popularMovies, onPressed)
             }
         }
         item {
@@ -90,7 +86,7 @@ fun ContentTV(lazyListState: LazyListState) {
             if (uiState.value.isLoadOnAir) {
                 HShimmerAnimation()
             } else {
-                PopularMovieTV("On Air", uiState.value.onAirMovies)
+                PopularMovieTV("On Air", uiState.value.onAirMovies, onPressed)
             }
         }
         item {
@@ -101,7 +97,7 @@ fun ContentTV(lazyListState: LazyListState) {
             if (uiState.value.isLoadTopRate) {
                 HShimmerAnimation()
             } else {
-                PopularMovieTV("Top Movie", uiState.value.topMovies)
+                PopularMovieTV("Top Movie", uiState.value.topMovies, onPressed)
             }
         }
         item {
@@ -111,7 +107,9 @@ fun ContentTV(lazyListState: LazyListState) {
 }
 
 @Composable
-fun PopularMovieTV(title: String, movies: List<Movie>) {
+fun PopularMovieTV(title: String,
+                   movies: List<Movie>,
+                   onPressed: (Movie) -> Unit) {
     Column {
         Text(text = title,
             modifier = Modifier.padding(16.dp),
@@ -124,7 +122,7 @@ fun PopularMovieTV(title: String, movies: List<Movie>) {
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp)) {
 
             itemsIndexed(movies) { _, item ->
-                HMovieCard(navController = appNavController, movie = item, false)
+                HMovieCard(item, onPressed = { onPressed(item) })
             }
 
         }

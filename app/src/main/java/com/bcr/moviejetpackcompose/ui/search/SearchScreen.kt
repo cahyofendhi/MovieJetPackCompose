@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.bcr.moviejetpackcompose.core.model.GroupType
+import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.core.viewmodels.SearchViewModel
 import com.bcr.moviejetpackcompose.core.viewmodels.SearchViewModelState
 import com.bcr.moviejetpackcompose.ui.card.VMovieCard
@@ -26,11 +26,9 @@ import com.bcr.moviejetpackcompose.ui.theme.white
 
 private lateinit var viewmodel: SearchViewModel
 private lateinit var uiState: State<SearchViewModelState>
-private lateinit var appNavController: NavController
 
 @Composable
-fun SearchScreen(navController: NavController, type: String, onBack:() -> Unit) {
-    appNavController = navController
+fun SearchScreen(type: String, onBack:() -> Unit, onPressed: (Movie) -> Unit) {
     viewmodel = SearchViewModel(type)
     uiState = viewmodel.uiState.collectAsState()
     viewmodel.searchMovies(false, "a")
@@ -61,13 +59,13 @@ fun SearchScreen(navController: NavController, type: String, onBack:() -> Unit) 
                    viewmodel.searchMovies(true, textState.value.text)
                })
             }
-            ContentSearch()
+            ContentSearch(onPressed)
         }
     }
 }
 
 @Composable
-fun ContentSearch() {
+fun ContentSearch(onPressed: (Movie) -> Unit) {
     val listState = rememberLazyListState()
     InfiniteList(listState = listState,
         onRefresh = {
@@ -75,7 +73,9 @@ fun ContentSearch() {
          },
         onLoadMore = {  viewmodel.getMovies() },
         data = uiState.value.movies,
-        content = { _, item ->  VMovieCard(navController = appNavController, movie = item, isMovie = viewmodel.type == GroupType.movie.type)},
+        content = { _, item ->  VMovieCard(movie = item, onPressed = {
+            onPressed(item)
+        })},
         isLoadmore = uiState.value.isLoading,
         isRefresh =  uiState.value.isRefresh,
     )
