@@ -19,6 +19,7 @@ enum class HomeSections(
 }
 
 sealed class MainNavigation(var route: String) {
+    object Login: MainNavigation("auth/login")
     object Home: MainNavigation("main")
     object MovieDetail : MainNavigation(
         "${Keys.routeName}?${Keys.movie}={${Keys.movie}}") {

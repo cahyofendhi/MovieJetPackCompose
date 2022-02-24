@@ -60,6 +60,12 @@ class MovieAppState(
         }
     }
 
+    fun startNewPage(route: String) {
+        navController.navigate(route) {
+            popUpTo(0)
+        }
+    }
+
 }
 
 /**
