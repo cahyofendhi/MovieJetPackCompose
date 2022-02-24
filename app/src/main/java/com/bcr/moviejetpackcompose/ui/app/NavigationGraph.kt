@@ -8,10 +8,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.bcr.moviejetpackcompose.core.model.GroupType
 import com.bcr.moviejetpackcompose.core.viewmodels.*
+import com.bcr.moviejetpackcompose.session
 import com.bcr.moviejetpackcompose.ui.detail.DetailMovieScreen
 import com.bcr.moviejetpackcompose.ui.detail.DetailTVScreen
 import com.bcr.moviejetpackcompose.ui.home.HomeScreen
 import com.bcr.moviejetpackcompose.ui.login.LoginScreen
+import com.bcr.moviejetpackcompose.ui.onboard.OnBoardScreen
 import com.bcr.moviejetpackcompose.ui.search.SearchScreen
 import com.bcr.moviejetpackcompose.ui.tv.TVScreen
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -20,7 +22,14 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 @ExperimentalPagerApi
 @Composable
 fun NavigationGraph(appState: MovieAppState) {
-    NavHost(appState.navController, startDestination = MainNavigation.Login.route) {
+    val route = if (!session.isOnboardDone) {
+         MainNavigation.OnBoard.route
+    } else if (!session.isLoginDone) {
+        MainNavigation.Login.route
+    } else {
+        MainNavigation.Home.route
+    }
+    NavHost(appState.navController, startDestination = route) {
         navigation(
             route = MainNavigation.Home.route,
             startDestination = HomeSections.Home.route
@@ -28,8 +37,16 @@ fun NavigationGraph(appState: MovieAppState) {
             addHomeGraph(appState)
         }
 
+        composable(MainNavigation.OnBoard.route) {
+            OnBoardScreen(onNext = {
+                session.isOnboardDone = true
+                appState.startNewPage(MainNavigation.Login.route)
+            })
+        }
+
         composable(MainNavigation.Login.route) { _ ->
             LoginScreen(LoginViewModel(), onNext = {
+                session.isLoginDone = true
                 appState.startNewPage(MainNavigation.Home.route)
             })
         }
