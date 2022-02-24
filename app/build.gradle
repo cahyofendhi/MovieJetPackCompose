@@ -56,13 +56,13 @@ android {
 dependencies {
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation "androidx.compose.ui:ui:1.1.0"
-    implementation "androidx.compose.material:material:1.1.0"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.1.0"
-    implementation "androidx.navigation:navigation-compose:2.5.0-alpha02"
+    implementation "androidx.compose.ui:ui:1.1.1"
+    implementation "androidx.compose.material:material:1.1.1"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.1.1"
+    implementation "androidx.navigation:navigation-compose:2.5.0-alpha03"
     implementation "androidx.activity:activity-compose:1.4.1"
     implementation "com.google.android.material:material:1.6.0-alpha02"
-    implementation "androidx.compose.material:material-icons-extended:1.1.0"
+    implementation "androidx.compose.material:material-icons-extended:1.1.1"
     implementation "io.coil-kt:coil-compose:1.4.0"
     implementation "com.google.accompanist:accompanist-pager:0.24.2-alpha"
     implementation "me.onebone:toolbar-compose:2.3.1"
@@ -71,10 +71,13 @@ dependencies {
     implementation "com.google.accompanist:accompanist-insets-ui:0.24.2-alpha"
     implementation "com.google.accompanist:accompanist-flowlayout:0.24.2-alpha"
     implementation "com.google.accompanist:accompanist-swiperefresh:0.24.2-alpha"
+    implementation "com.google.accompanist:accompanist-pager:0.24.2-alpha"
+    implementation "com.google.accompanist:accompanist-pager-indicators:0.24.2-alpha"
+    implementation "androidx.preference:preference-ktx:1.2.0"
 
     // lifecycle
     implementation "androidx.lifecycle:lifecycle-common:2.4.1"
-    implementation "androidx.lifecycle:lifecycle-runtime:2.4.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.1"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.1"
     // retrofit
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
