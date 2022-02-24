@@ -12,6 +12,7 @@ import com.bcr.moviejetpackcompose.ui.detail.DetailMovieScreen
 import com.bcr.moviejetpackcompose.ui.detail.DetailTVScreen
 import com.bcr.moviejetpackcompose.ui.home.HomeScreen
 import com.bcr.moviejetpackcompose.ui.login.LoginScreen
+import com.bcr.moviejetpackcompose.ui.onboard.OnBoardScreen
 import com.bcr.moviejetpackcompose.ui.search.SearchScreen
 import com.bcr.moviejetpackcompose.ui.tv.TVScreen
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -20,12 +21,18 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 @ExperimentalPagerApi
 @Composable
 fun NavigationGraph(appState: MovieAppState) {
-    NavHost(appState.navController, startDestination = MainNavigation.Login.route) {
+    NavHost(appState.navController, startDestination = MainNavigation.OnBoard.route) {
         navigation(
             route = MainNavigation.Home.route,
             startDestination = HomeSections.Home.route
         ) {
             addHomeGraph(appState)
+        }
+
+        composable(MainNavigation.OnBoard.route) {
+            OnBoardScreen(onNext = {
+                appState.startNewPage(MainNavigation.Login.route)
+            })
         }
 
         composable(MainNavigation.Login.route) { _ ->
