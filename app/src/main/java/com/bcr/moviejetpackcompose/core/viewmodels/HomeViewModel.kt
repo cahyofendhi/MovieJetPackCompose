@@ -6,7 +6,10 @@ import com.bcr.moviejetpackcompose.core.model.CategoryType
 import com.bcr.moviejetpackcompose.core.model.GroupType
 import com.bcr.moviejetpackcompose.core.model.Movie
 import com.bcr.moviejetpackcompose.core.network.ResultWrapper
+import com.bcr.moviejetpackcompose.core.repositories.MovieRepository
 import com.bcr.moviejetpackcompose.core.repositories.MovieRepositoryImpl
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.map
@@ -32,11 +35,9 @@ data class HomeViewModelState(
             )
 }
 
-class HomeViewModel: ViewModel() {
+class HomeViewModel(private val repository: MovieRepository = MovieRepositoryImpl()): ViewModel() {
 
-    private val viewModelState = MutableStateFlow(HomeViewModelState())
-    private var repository: MovieRepositoryImpl = MovieRepositoryImpl()
-
+    val viewModelState = MutableStateFlow(HomeViewModelState())
     val uiState = viewModelState
         .map { it.toUiState() }
         .stateIn(
@@ -51,7 +52,7 @@ class HomeViewModel: ViewModel() {
         getMovies(CategoryType.toprate)
     }
 
-    private fun getMovies(type: CategoryType) {
+    fun getMovies(type: CategoryType) {
         viewModelScope.launch {
             val response = repository.getMovies(GroupType.movie, type, 1)
             viewModelState.update {
