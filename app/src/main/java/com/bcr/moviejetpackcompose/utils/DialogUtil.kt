@@ -8,6 +8,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.window.Dialog
 import com.bcr.moviejetpackcompose.ui.theme.white
 import androidx.compose.ui.unit.dp
@@ -25,6 +26,7 @@ fun LoadingDialog() {
             modifier = Modifier
                 .size(100.dp)
                 .background(white, shape = RoundedCornerShape(8.dp))
+                .testTag(DIALOG_LOADING_TAG)
         ) {
             CircularProgressIndicator()
         }

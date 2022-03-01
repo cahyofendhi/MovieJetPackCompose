@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.bcr.moviejetpackcompose.ui.theme.*
 
@@ -39,15 +40,18 @@ fun SearchButton(onClick: () -> Unit) {
 @Composable
 fun AppButton(title: String,
               enable: Boolean = false,
+              testTag: String = "",
               onClick: () -> Unit) {
     Button(
         onClick = if (enable) { onClick } else { {} },
         colors = ButtonDefaults
             .buttonColors(backgroundColor = if (enable) { primaryBlack} else { secondGray }),
         shape = RoundedCornerShape(size = 10.dp),
+        enabled = enable,
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
+            .height(48.dp)
+            .testTag(testTag),
     ) {
         Text(
             text = title,

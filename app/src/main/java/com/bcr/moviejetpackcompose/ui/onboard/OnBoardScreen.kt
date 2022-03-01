@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import com.bcr.moviejetpackcompose.core.model.OnBoard
 
@@ -18,10 +19,13 @@ import com.bcr.moviejetpackcompose.ui.theme.appTypography
 import com.bcr.moviejetpackcompose.ui.theme.gray
 import com.bcr.moviejetpackcompose.ui.theme.primaryBlack
 import com.bcr.moviejetpackcompose.ui.theme.white
+import com.bcr.moviejetpackcompose.utils.NEXT_ONBOARD_TAG
+import com.bcr.moviejetpackcompose.utils.PAGER_ONBOARD_TAG
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
+
 
 val onBoardPages = listOf(
     OnBoard("Onboard Page 1", "Description OnBoard Page 1", R.drawable.onboard),
@@ -48,6 +52,7 @@ fun OnBoardScreen(onNext: () -> Unit) {
                 modifier = Modifier
                     .fillMaxSize()
                     .weight(1f)
+                    .testTag(PAGER_ONBOARD_TAG),
             ) { page ->
 
                 ContentOnBoard(onBoard = onBoardPages[page])
@@ -75,7 +80,9 @@ fun OnBoardScreen(onNext: () -> Unit) {
                     contentAlignment = Alignment.CenterEnd
                 ) {
                     this@Row.AnimatedVisibility(visible = pagerState.currentPage == 2) {
-                        Button( modifier = Modifier.wrapContentSize(),
+                        Button( modifier = Modifier
+                            .wrapContentSize()
+                            .testTag(NEXT_ONBOARD_TAG),
                             onClick = onNext) {
                             Text(text = "Next", style = appTypography.subtitle2.copy(white))
                         }
