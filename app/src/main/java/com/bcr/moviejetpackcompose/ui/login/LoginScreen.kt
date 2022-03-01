@@ -19,7 +19,10 @@ import com.bcr.moviejetpackcompose.ui.components.AppIcon
 import com.bcr.moviejetpackcompose.ui.components.field.AppField
 import com.bcr.moviejetpackcompose.ui.components.field.PasswordField
 import com.bcr.moviejetpackcompose.ui.theme.*
+import com.bcr.moviejetpackcompose.utils.EMAIL_FIELD_LOGIN_TAG
 import com.bcr.moviejetpackcompose.utils.LoadingDialog
+import com.bcr.moviejetpackcompose.utils.PASSWORD_FIELD_LOGIN_TAG
+import com.bcr.moviejetpackcompose.utils.SUBMIT_BUTTON_LOGIN_TAG
 
 private lateinit var uiState: State<LoginState>
 
@@ -49,11 +52,16 @@ fun LoginScreen(viewmodel: LoginViewModel, onNext: () -> Unit) {
 
             PasswordField(value = uiState.value.password.value,
                 error = uiState.value.password.error,
-                onValueChange = { value -> viewmodel.updatePassword(value) })
+                onValueChange = { value -> viewmodel.updatePassword(value) },
+                testTag = PASSWORD_FIELD_LOGIN_TAG,
+            )
 
             Spacer(modifier = Modifier.padding(top = 32.dp))
 
-            AppButton(title = "Submit", enable = uiState.value.valid) {
+            AppButton(title = "Submit",
+                enable = uiState.value.valid,
+                testTag = SUBMIT_BUTTON_LOGIN_TAG
+            ) {
                 viewmodel.submit()
             }
 
@@ -81,7 +89,8 @@ private fun EmailTextField(onValueChange: (String) -> Unit) {
         onValueChange = onValueChange,
         hint = "email@gmail.com",
         error = uiState.value.email.error,
-        leadingIcon = { AppIcon(imageVector = Icons.Filled.Email) }
+        leadingIcon = { AppIcon(imageVector = Icons.Filled.Email) },
+        testTag = EMAIL_FIELD_LOGIN_TAG
     )
 
 }

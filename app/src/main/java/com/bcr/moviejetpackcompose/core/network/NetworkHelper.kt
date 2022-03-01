@@ -1,5 +1,6 @@
 package com.bcr.moviejetpackcompose.core.network
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -20,8 +21,8 @@ suspend fun <T> safeApiCall(dispatcher: CoroutineDispatcher, apiCall: suspend ()
                 is IOException -> ResultWrapper.NetworkError
                 is HttpException -> {
                     val code = throwable.code()
-                    val errorResponse = throwable.message
-                    ResultWrapper.GenericError(code, errorResponse)
+                    val errorResponse = throwable.response()?.errorBody()?.string()
+                    ResultWrapper.GenericError(code, errorResponse.toString())
                 }
                 else -> {
                     ResultWrapper.GenericError(null, null)

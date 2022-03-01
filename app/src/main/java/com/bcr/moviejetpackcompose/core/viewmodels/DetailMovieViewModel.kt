@@ -12,6 +12,7 @@ import com.bcr.moviejetpackcompose.core.repositories.MovieRepositoryImpl
 import kotlinx.coroutines.launch
 import com.bcr.moviejetpackcompose.core.model.Crew
 import com.bcr.moviejetpackcompose.core.model.GroupType
+import com.bcr.moviejetpackcompose.core.repositories.MovieRepository
 import kotlinx.coroutines.flow.*
 
 data class DetailViewModelState(
@@ -31,9 +32,9 @@ data class DetailViewModelState(
         )
 }
 
-class DetailMovieViewModel(val movie: Movie?): ViewModel() {
+class DetailMovieViewModel(val movie: Movie?,
+                           private val repository: MovieRepository = MovieRepositoryImpl()):ViewModel() {
 
-    private var repository: MovieRepositoryImpl = MovieRepositoryImpl()
     private val viewModelState = MutableStateFlow(DetailViewModelState())
 
     val uiState = viewModelState

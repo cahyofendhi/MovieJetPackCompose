@@ -56,7 +56,7 @@ class LoginViewModel: ViewModel() {
             override fun run() {
                 viewModelState.update { it.copy(status = Status.SUCCESS) }
             }
-        }, 5000)
+        }, 3000)
     }
 
 }
