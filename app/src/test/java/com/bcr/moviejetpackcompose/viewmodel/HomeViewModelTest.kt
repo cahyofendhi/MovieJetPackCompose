@@ -13,7 +13,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 
 @ExperimentalCoroutinesApi
-class TestHomeViewModel {
+class HomeViewModelTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule

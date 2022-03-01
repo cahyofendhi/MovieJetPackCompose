@@ -35,7 +35,7 @@ fun MovieApp() {
 }
 
 @Composable
-private fun BottomNavigationBar(appState: MovieAppState) {
+fun BottomNavigationBar(appState: MovieAppState) {
     val items = listOf(
         HomeSections.Home,
         HomeSections.Tv

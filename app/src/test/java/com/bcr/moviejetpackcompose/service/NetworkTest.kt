@@ -13,7 +13,7 @@ import retrofit2.Response
 import java.io.IOException
 
 
-class TestNetwork {
+class NetworkTest {
 
     private val dispatcher = Dispatchers.Default
 

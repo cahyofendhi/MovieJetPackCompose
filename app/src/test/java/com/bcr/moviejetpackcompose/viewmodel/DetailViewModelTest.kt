@@ -15,7 +15,7 @@ import org.junit.Test
 
 
 @ExperimentalCoroutinesApi
-class TestDetailViewModel {
+class DetailViewModelTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule

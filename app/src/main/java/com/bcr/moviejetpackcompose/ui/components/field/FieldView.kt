@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import com.bcr.moviejetpackcompose.ui.components.AppIcon
@@ -37,6 +38,7 @@ fun AppField(value: String,
              trailingIcon: @Composable () -> Unit = {},
              visualTransformation: VisualTransformation = VisualTransformation.None,
              keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+             testTag: String = "",
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -60,7 +62,8 @@ fun AppField(value: String,
                     ),
                     shape = RoundedCornerShape(10.dp)
                 )
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .testTag(testTag),
             textStyle = appTypography.body1,
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
@@ -92,7 +95,8 @@ fun AppField(value: String,
 @Composable
 fun PasswordField(value: String,
                   error: String? = null,
-                  onValueChange: (String) -> Unit,) {
+                  onValueChange: (String) -> Unit,
+                  testTag: String = "") {
     var passwordVisibility by remember { mutableStateOf(false) }
 
     AppField(value = value,
@@ -113,7 +117,8 @@ fun PasswordField(value: String,
             }) {
                 AppIcon(imageVector = image)
             }
-        }
+        },
+        testTag = testTag,
     )
 
 }
