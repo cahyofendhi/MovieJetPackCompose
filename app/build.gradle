@@ -26,12 +26,12 @@ android {
 
     signingConfigs{
         release {
-            if (project.hasProperty('KEY_STORE_FILE')){
-                storeFile file(KEY_STORE_FILE)
-                storePassword STORE_PASSWORD
-                keyAlias KEY_ALIAS
-                keyPassword KEY_PASSWORD
-            }
+//            if (project.hasProperty('KEY_STORE_FILE')){
+//                storeFile file(KEY_STORE_FILE)
+//                storePassword STORE_PASSWORD
+//                keyAlias KEY_ALIAS
+//                keyPassword KEY_PASSWORD
+//            }
         }
     }
 
