@@ -33,7 +33,7 @@ android {
 //                keyPassword KEY_PASSWORD
 //            }
 //        }
-    }
+//    }
 
     buildTypes {
         release {
